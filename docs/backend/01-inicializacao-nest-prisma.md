@@ -180,4 +180,4 @@ curl http://localhost:3000/health
 | Client gerado fora do Git + `postinstall` | Código gerado não deve ser versionado; é recriado no `npm install` |
 
 ## Próximos passos
-- Issue #11: modelar Loja, Produto, Categoria e Reserva no `schema.prisma` e criar os módulos (CRUDs).
+- Issue #11: modelar o banco e criar os módulos (CRUDs). Ver [02-modulos-crud.md](02-modulos-crud.md).

@@ -31,7 +31,10 @@ cp .env.example .env
 # 3. Subir o banco Postgres no Docker
 npm run db:up
 
-# 4. Rodar a API em modo desenvolvimento (reinicia ao salvar)
+# 4. Criar as tabelas no banco
+npx prisma migrate dev
+
+# 5. Rodar a API em modo desenvolvimento (reinicia ao salvar)
 npm run start:dev
 ```
 
@@ -65,33 +68,51 @@ curl http://localhost:3000/health
 | `POSTGRES_PASSWORD` | `ache123` | Senha do Postgres (Docker) |
 | `POSTGRES_DB` | `ache_petrolina` | Nome do banco (Docker) |
 | `POSTGRES_PORT` | `5433` | Porta do Postgres no seu PC (5433 pra não conflitar com um Postgres já instalado) |
+| `RESERVA_VALIDADE_HORAS` | `24` | Horas até uma reserva expirar |
 | `DATABASE_URL` | `postgresql://ache:ache123@localhost:5433/ache_petrolina?schema=public` | Conexão usada pelo Prisma |
 
 > O `.env` **não vai pro Git** (está no `.gitignore`). Só o `.env.example` é versionado.
 
 ## Rotas
 
+Documentação interativa (Swagger): **http://localhost:3000/docs**. Exemplos prontos em [`requests.http`](requests.http).
+
 | Método | Rota | Descrição |
 |---|---|---|
-| GET | `/` | Hello World (teste básico) |
 | GET | `/health` | Verifica se a API e o banco estão no ar |
+| POST / GET | `/lojas` | Cadastrar / listar lojas (`?bairro=`) |
+| GET / PATCH / DELETE | `/lojas/:id` | Perfil (com produtos) / editar / remover |
+| POST / GET | `/categorias` | Criar / listar categorias |
+| GET / PATCH / DELETE | `/categorias/:id` | Ver / editar / remover |
+| POST / GET | `/produtos` | Cadastrar / catálogo (`?busca=&bairro=&categoria=&lojaId=&statusEstoque=&precoMin=&precoMax=`) |
+| GET / PATCH / DELETE | `/produtos/:id` | Detalhes / editar / remover |
+| PATCH | `/produtos/:id/estoque` | Mudar status de estoque |
+| POST / GET | `/reservas` | Criar reserva / listar (`?status=&lojaId=&produtoId=`) |
+| GET | `/reservas/:id` | Ver reserva |
+| PATCH | `/reservas/:id/status` | Mudar status (NOVA → CONFIRMADA → RETIRADA, etc.) |
 
 ## Estrutura
 
 ```
 backend/
 ├── prisma/
-│   └── schema.prisma        # Modelos do banco (tabelas)
+│   ├── schema.prisma        # Modelos do banco (tabelas)
+│   └── migrations/          # Histórico de mudanças no banco (SQL)
 ├── prisma.config.ts         # Configuração do Prisma CLI
 ├── docker-compose.yml       # Postgres para desenvolvimento
+├── requests.http            # Requisições de exemplo (REST Client)
 ├── src/
-│   ├── main.ts              # Ponto de entrada: sobe o servidor
+│   ├── main.ts              # Sobe o servidor: validação, CORS, Swagger
 │   ├── app.module.ts        # Módulo raiz: junta todos os outros
 │   ├── app.controller.ts    # Rotas / e /health
-│   ├── app.service.ts
-│   ├── prisma/
-│   │   ├── prisma.module.ts   # Disponibiliza o Prisma para a API toda
-│   │   └── prisma.service.ts  # Conexão com o banco
+│   ├── common/
+│   │   ├── filters/         # Converte erros do Prisma em 404/409
+│   │   └── utils/           # slugify
+│   ├── prisma/              # PrismaModule + PrismaService (conexão)
+│   ├── lojas/               # module, controller, service, dto/
+│   ├── categorias/
+│   ├── produtos/
+│   ├── reservas/
 │   └── generated/prisma/    # Prisma Client gerado (não vai pro Git)
 └── test/                    # Testes end-to-end
 ```
