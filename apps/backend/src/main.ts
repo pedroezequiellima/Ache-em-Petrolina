@@ -1,11 +1,19 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module.js';
 import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const producao = process.env.NODE_ENV === 'production';
+
+  // Cabeçalhos de segurança HTTP (esconde o "X-Powered-By: Express", impede
+  // a API de ser aberta dentro de um <iframe>, etc). A Content-Security-Policy
+  // só liga em produção, porque a página do Swagger (só em dev) usa scripts
+  // que ela bloquearia.
+  app.use(helmet({ contentSecurityPolicy: producao }));
 
   // Libera só o front (Next.js) para chamar a API pelo navegador
   app.enableCors({
@@ -25,7 +33,7 @@ async function bootstrap() {
 
   // Documentação interativa das rotas em /docs. Desligada em produção:
   // não precisamos mostrar o mapa da API para qualquer um.
-  if (process.env.NODE_ENV !== 'production') {
+  if (!producao) {
     const config = new DocumentBuilder()
       .setTitle('Ache em Petrolina API')
       .setDescription(

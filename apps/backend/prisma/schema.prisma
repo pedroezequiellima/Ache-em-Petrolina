@@ -43,8 +43,25 @@ model Usuario {
   criadoEm     DateTime @default(now())
   atualizadoEm DateTime @updatedAt
 
+  tokensRedefinicao TokenRedefinicaoSenha[]
+
   @@index([lojaId])
   @@map("usuarios")
+}
+
+// "Esqueci minha senha": código de uso único, com validade curta.
+// Guardamos só o hash (SHA-256): quem ler o banco não consegue usar o código.
+model TokenRedefinicaoSenha {
+  id        Int       @id @default(autoincrement())
+  usuarioId Int
+  usuario   Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiraEm  DateTime
+  usadoEm   DateTime?
+  criadoEm  DateTime  @default(now())
+
+  @@index([usuarioId])
+  @@map("tokens_redefinicao_senha")
 }
 
 model Bairro {

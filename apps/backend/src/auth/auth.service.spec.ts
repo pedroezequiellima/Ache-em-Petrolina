@@ -1,6 +1,8 @@
-import { UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Papel } from '../generated/prisma/enums.js';
+import { EmailService } from '../email/email.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { AuthService } from './auth.service.js';
 import { gerarHashDaSenha } from './senha.js';
@@ -11,7 +13,12 @@ describe('AuthService.login', () => {
     secret: 'segredo-de-teste-com-mais-de-32-caracteres',
   });
   const prismaMock = { usuario: { findUnique: vi.fn() } };
-  const service = new AuthService(prismaMock as unknown as PrismaService, jwt);
+  const service = new AuthService(
+    prismaMock as unknown as PrismaService,
+    jwt,
+    {} as EmailService,
+    new ConfigService(),
+  );
 
   beforeEach(async () => {
     prismaMock.usuario.findUnique.mockResolvedValue({
@@ -70,5 +77,80 @@ describe('garantirAcessoALoja', () => {
     expect(() =>
       garantirAcessoALoja({ id: 2, papel: Papel.LOJISTA, lojaId: 9 }, 1),
     ).toThrow('Você só pode gerenciar a sua própria loja');
+  });
+});
+
+describe('AuthService: esqueci minha senha', () => {
+  const prismaMock = {
+    usuario: { findUnique: vi.fn(), update: vi.fn() },
+    tokenRedefinicaoSenha: {
+      deleteMany: vi.fn(),
+      create: vi.fn(),
+      findFirst: vi.fn(),
+      update: vi.fn(),
+    },
+    $transaction: vi.fn(),
+  };
+  const emailMock = { enviar: vi.fn() };
+  const service = new AuthService(
+    prismaMock as unknown as PrismaService,
+    new JwtService({ secret: 'segredo-de-teste-com-mais-de-32-caracteres' }),
+    emailMock as unknown as EmailService,
+    new ConfigService({ FRONTEND_URL: 'http://front.test' }),
+  );
+
+  beforeEach(() => vi.clearAllMocks());
+
+  it('e-mail cadastrado: guarda só o HASH do código e manda o link', async () => {
+    prismaMock.usuario.findUnique.mockResolvedValue({
+      id: 5,
+      nome: 'Ana',
+      email: 'ana@loja.com',
+    });
+
+    await service.esqueciSenha('ana@loja.com');
+
+    const { data } = prismaMock.tokenRedefinicaoSenha.create.mock.calls[0][0];
+    const { texto } = emailMock.enviar.mock.calls[0][0];
+    const token = /token=([A-Za-z0-9_-]+)/.exec(texto)![1];
+    expect(texto).toContain('http://front.test/redefinir-senha?token=');
+    expect(data.tokenHash).not.toBe(token); // o código puro não vai pro banco
+    expect(data.tokenHash).toHaveLength(64); // sha256 em hex
+  });
+
+  it('e-mail que não existe: mesma resposta e nenhum e-mail enviado', async () => {
+    prismaMock.usuario.findUnique.mockResolvedValue(null);
+
+    const resposta = await service.esqueciSenha('ninguem@x.com');
+
+    expect(resposta.mensagem).toContain('Se o e-mail estiver cadastrado');
+    expect(emailMock.enviar).not.toHaveBeenCalled();
+  });
+
+  it('código inválido, vencido ou já usado: 400', async () => {
+    prismaMock.tokenRedefinicaoSenha.findFirst.mockResolvedValue(null);
+
+    await expect(
+      service.redefinirSenha('codigo-qualquer', 'nova-senha-123'),
+    ).rejects.toThrow(BadRequestException);
+    expect(prismaMock.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('código válido: troca a senha e marca o código como usado', async () => {
+    prismaMock.tokenRedefinicaoSenha.findFirst.mockResolvedValue({
+      id: 9,
+      usuarioId: 5,
+    });
+
+    await service.redefinirSenha('codigo-valido', 'nova-senha-123');
+
+    expect(prismaMock.$transaction).toHaveBeenCalled();
+    expect(
+      prismaMock.tokenRedefinicaoSenha.update.mock.calls[0][0].data.usadoEm,
+    ).toBeInstanceOf(Date);
+    const { where } =
+      prismaMock.tokenRedefinicaoSenha.findFirst.mock.calls[0][0];
+    expect(where.usadoEm).toBeNull();
+    expect(where.expiraEm.gt).toBeInstanceOf(Date);
   });
 });

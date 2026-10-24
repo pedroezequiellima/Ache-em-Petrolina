@@ -25,6 +25,18 @@ Content-Type: application/json
 @admin = {{loginAdmin.response.body.accessToken}}
 @lojista = {{loginLojista.response.body.accessToken}}
 
+### Esqueci minha senha (o e-mail com o link aparece no terminal da API)
+POST {{api}}/auth/esqueci-senha
+Content-Type: application/json
+
+{ "email": "passo-certo-calcados@lojista.local" }
+
+### Redefinir a senha (cole o código que veio no link)
+POST {{api}}/auth/redefinir-senha
+Content-Type: application/json
+
+{ "token": "COLE-O-CODIGO-AQUI", "novaSenha": "nova-senha-123" }
+
 ### Quem sou eu? 🔒
 GET {{api}}/auth/me
 Authorization: Bearer {{lojista}}

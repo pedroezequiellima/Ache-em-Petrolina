@@ -3,7 +3,9 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service.js';
 import { Publico, UsuarioAtual } from './decorators.js';
+import { EsqueciSenhaDto } from './dto/esqueci-senha.dto.js';
 import { LoginDto } from './dto/login.dto.js';
+import { RedefinirSenhaDto } from './dto/redefinir-senha.dto.js';
 import { TrocarSenhaDto } from './dto/trocar-senha.dto.js';
 import type { UsuarioLogado } from './usuario-logado.js';
 
@@ -34,5 +36,22 @@ export class AuthController {
     @Body() dto: TrocarSenhaDto,
   ) {
     return this.authService.trocarSenha(usuario, dto.senhaAtual, dto.novaSenha);
+  }
+
+  // Envia o link por e-mail. 3 pedidos por minuto por IP (evita usar a API para mandar spam)
+  @Publico()
+  @Throttle({ default: { limit: 3, ttl: 60_000 } })
+  @Post('esqueci-senha')
+  @HttpCode(200)
+  esqueciSenha(@Body() dto: EsqueciSenhaDto) {
+    return this.authService.esqueciSenha(dto.email);
+  }
+
+  @Publico()
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post('redefinir-senha')
+  @HttpCode(200)
+  redefinirSenha(@Body() dto: RedefinirSenhaDto) {
+    return this.authService.redefinirSenha(dto.token, dto.novaSenha);
   }
 }

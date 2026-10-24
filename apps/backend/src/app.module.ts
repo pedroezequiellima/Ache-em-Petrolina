@@ -5,6 +5,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { AuthModule } from './auth/auth.module.js';
+import { EmailModule } from './email/email.module.js';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard.js';
 import { PapeisGuard } from './auth/guards/papeis.guard.js';
 import { PrismaModule } from './prisma/prisma.module.js';
@@ -21,6 +22,7 @@ import { UsuariosModule } from './usuarios/usuarios.module.js';
     // Limite geral: 100 requisições por minuto por IP (rotas sensíveis têm limite menor)
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     PrismaModule,
+    EmailModule,
     AuthModule,
     UsuariosModule,
     LojasModule,
