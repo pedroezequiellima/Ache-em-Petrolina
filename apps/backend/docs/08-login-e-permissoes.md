@@ -75,6 +75,7 @@ No login, o bcrypt calcula o hash da senha digitada e compara com o guardado.
 |---|---|---|---|
 | `GET /health`, `GET /` | ✅ | ✅ | ✅ |
 | `POST /auth/login` | ✅ (5/min) | ✅ | ✅ |
+| `POST /auth/esqueci-senha` · `POST /auth/redefinir-senha` | ✅ (3/min · 5/min) | ✅ | ✅ |
 | `GET /auth/me`, `PATCH /auth/senha` | ❌ | ✅ | ✅ |
 | `GET /bairros`, `/categorias`, `/lojas`, `/produtos` (e por id/slug) | ✅ | ✅ | ✅ |
 | `POST/PATCH/DELETE /bairros`, `/categorias` | ❌ | ❌ | ✅ |
@@ -107,6 +108,7 @@ O `JwtAuthGuard` é **global**: toda rota exige login, a não ser que tenha `@Pu
 | Lojista não altera a nota da própria loja | `lojas.service.ts` | A nota não é ele quem define |
 | E-mail sempre em minúsculas | `auth` e `usuarios` | `Ana@x.com` e `ana@x.com` são a mesma pessoa |
 | Swagger desligado em produção | `main.ts` | Não expõe o mapa da API |
+| **Cabeçalhos de segurança** (`helmet`) | `main.ts` | Esconde o `X-Powered-By: Express`, impede abrir a API num `<iframe>` (`X-Frame-Options`), proíbe o navegador de "adivinhar" o tipo do arquivo (`nosniff`), força HTTPS em produção (`Strict-Transport-Security`). A `Content-Security-Policy` só liga em produção, porque a página do Swagger (que só existe em dev) usa scripts que ela bloquearia |
 
 ---
 
@@ -128,10 +130,12 @@ src/auth/
     ├── papeis.guard.ts     # 403: confere o papel
     └── guards.spec.ts      # testes dos dois guards
 src/usuarios/               # só ADMIN: cadastra lojistas e admins
+src/email/                  # EmailService: por enquanto escreve no log
+prisma/migrations/20261024210000_redefinicao_de_senha/
 prisma/migrations/20261024190000_usuarios_e_login/
 ```
 
-Banco: tabela **`usuarios`** (nome, email único, senhaHash, papel ADMIN/LOJISTA, lojaId).
+Banco: tabela **`usuarios`** (nome, email único, senhaHash, papel ADMIN/LOJISTA, lojaId) e **`tokens_redefinicao_senha`** (hash do código, validade, quando foi usado).
 
 ---
 
@@ -166,13 +170,43 @@ Gerar um segredo: `node -e "console.log(require('crypto').randomBytes(48).toStri
 
 ## Testes
 
-**Unitários** (17 novos, total 40):
+**Unitários** (21 novos, total 44):
 - Guards: rota pública passa sem token; protegida sem token = 401; token falso = 401; token válido coloca o usuário na requisição; papel errado = 403.
 - Login: senha certa gera token com id/papel/loja e sem `senhaHash`; senha errada = 401; e-mail inexistente = **mesma mensagem**; e-mail em minúsculas.
 - Dono da loja: admin acessa qualquer uma; lojista só a dele.
 - Reservas: lojista não lista nem mexe em reserva de outra loja, mesmo pedindo `?lojaId=` de outra.
+- Esqueci a senha: só o hash vai pro banco; e-mail inexistente não envia nada; código inválido/vencido/usado = 400; código válido troca a senha e marca como usado.
 
-**Manuais** (API rodando com o seed): todas as linhas da matriz de rotas acima, incluindo o bloqueio de 5 logins por minuto (429).
+**Manuais** (API rodando com o seed): todas as linhas da matriz de rotas acima, incluindo o bloqueio de 5 logins por minuto (429); os cabeçalhos do helmet; e o fluxo completo do "esqueci minha senha" (link no log, troca, senha antiga recusada, link reutilizado recusado).
+
+---
+
+## Esqueci minha senha
+
+```
+1. POST /auth/esqueci-senha { email }
+     └─ se o e-mail existe: gera um código aleatório (32 bytes), guarda só o HASH
+        (SHA-256) com validade de 30 min e "envia" o link por e-mail
+     └─ responde SEMPRE a mesma mensagem (não revela quem tem conta)
+
+2. Usuário abre o link:  <FRONTEND_URL>/redefinir-senha?token=<código>
+     (a página do front ainda precisa ser criada)
+
+3. POST /auth/redefinir-senha { token, novaSenha }
+     └─ procura o hash do código, ainda não usado e dentro da validade
+     └─ troca a senha E marca o código como usado, juntos (transação)
+```
+
+| Proteção | Por quê |
+|---|---|
+| Mesma resposta para e-mail existente e inexistente | Não revela quem tem conta |
+| Só o **hash** do código vai pro banco | Quem ler o banco (vazamento, backup) não consegue usar o código |
+| Validade de **30 minutos** e **uso único** | Um link antigo esquecido no e-mail não serve mais |
+| Pedir um link novo cancela os anteriores | Só o último link vale |
+| **3 pedidos por minuto** por IP | Não deixa usar a API para mandar spam de e-mail |
+| Troca de senha + marcar como usado numa **transação** | Ou as duas coisas acontecem, ou nenhuma |
+
+**E-mail:** o projeto ainda não tem um serviço de e-mail. O `EmailService` (`src/email/`) por enquanto **escreve o e-mail no terminal da API**. Para enviar de verdade, só o corpo de `enviar()` muda (SMTP com nodemailer, Resend, Amazon SES...), com as credenciais no `.env`.
 
 ---
 
@@ -181,8 +215,10 @@ Gerar um segredo: `node -e "console.log(require('crypto').randomBytes(48).toStri
 | Item | Prioridade |
 |---|---|
 | Tela de login e área do lojista no **front** | Alta (combinar com o grupo) |
-| Cabeçalhos de segurança (`helmet`), com ajuste para o Swagger | Média |
-| "Esqueci minha senha" (precisa de envio de e-mail) | Média |
+| ~~Cabeçalhos de segurança (`helmet`)~~ | ✅ Feito |
+| ~~"Esqueci minha senha"~~ | ✅ Feito (falta só ligar um provedor de e-mail de verdade) |
+| Provedor de e-mail real (SMTP, Resend, SES) no `EmailService` | Média |
+| Página `/redefinir-senha` no **front** (o link do e-mail aponta pra ela) | Média |
 | Revogar token antes de expirar (ex: lista de tokens bloqueados ou token curto + refresh token) | Baixa no MVP |
 | Bloquear a conta depois de muitas tentativas erradas (hoje o limite é por IP) | Baixa |
 | HTTPS na frente da API (Nginx, issue #8) | Alta em produção |

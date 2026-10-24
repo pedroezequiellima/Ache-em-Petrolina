@@ -48,7 +48,7 @@ O que fazer: proteger `GET /reservas` e `GET /reservas/:id` com o mesmo login do
 Um robô pode criar milhares de reservas falsas por minuto.
 O que fazer: `@nestjs/throttler` (ex: no máximo 5 reservas por minuto por IP).
 
-**4. Sem cabeçalhos de segurança HTTP.**
+**4. ~~Sem cabeçalhos de segurança HTTP.~~ ✅ Feito (doc 08): helmet.**
 O que fazer: `helmet` no `main.ts`, que adiciona `X-Content-Type-Options`, `X-Frame-Options` etc. e esconde o `X-Powered-By: Express`. (O README do front tem a mesma pendência do lado dele.)
 
 **5. ~~Swagger aberto em produção.~~ ✅ Feito (doc 08): só liga fora de produção.**
@@ -90,7 +90,8 @@ Os 4 alertas que sobram são todos a mesma falha do `multer`, contada em cada pa
 | Login / permissões | ✅ JWT + papéis + "só a própria loja" (doc 08) |
 | Dados pessoais das reservas | ✅ Só o lojista da loja e o admin |
 | Rate limit | ✅ Login 5/min, reservas 10/min, geral 100/min |
-| Cabeçalhos (helmet) | ❌ A fazer |
+| Cabeçalhos (helmet) | ✅ Feito |
+| Esqueci minha senha | ✅ Feito (e-mail ainda só no log) |
 | Swagger em produção | ✅ Desligado |
 | Senhas | ✅ bcrypt; o hash nunca sai do banco |
 | HTTPS | ⏳ Infra (#8) |

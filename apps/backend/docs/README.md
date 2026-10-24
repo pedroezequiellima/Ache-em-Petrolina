@@ -34,6 +34,7 @@ Como rodar: [`../README.md`](../README.md).
 | 24/10 | **PR #12 juntado na `main`** (merge feito pelo Daniel no GitHub) | `Merge pull request #12` |
 | 24/10 | Banco no formato do front (bairros, horários, slugs), seed com os dados do front, busca com relevância, Swagger sem plugin | `feat(backend): alinha banco e API ao modelo do front` |
 | 24/10 | Login com JWT, papéis ADMIN/LOJISTA, rotas protegidas, reservas só da própria loja, limite de requisições | `feat(backend): login com JWT e rotas protegidas por papel` |
+| 24/10 | "Esqueci minha senha" (link de uso único, 30 min) e cabeçalhos de segurança (helmet) | `feat(backend): esqueci minha senha e cabeçalhos de segurança` |
 
 ## Situação atual
 
@@ -50,10 +51,11 @@ Como rodar: [`../README.md`](../README.md).
 | Seed com dados do front | ✅ 8 lojas e 30 produtos |
 | Busca com relevância no back | ✅ Pronto |
 | Login e proteção das reservas | ✅ Pronto (doc 08) |
+| Esqueci minha senha + helmet | ✅ Pronto (doc 08) |
 | Tela de login no front | 📋 Combinar com o grupo |
 
 ## Números
 
-- **7** tabelas · **7** módulos · **33** rotas (27 de catálogo/reservas + 3 de login + 3 de usuários) + `/health` e `/docs`
-- **40** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed, incluindo cada permissão (24/10)
+- **8** tabelas · **8** módulos · **35** rotas (27 de catálogo/reservas + 5 de login + 3 de usuários) + `/health` e `/docs`
+- **44** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed, incluindo cada permissão (24/10)
 - Portas: front **3000** · API **3001** · Postgres **5433**

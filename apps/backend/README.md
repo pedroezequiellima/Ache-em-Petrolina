@@ -95,6 +95,7 @@ Documentação interativa (Swagger): **http://localhost:3001/docs**. Exemplos pr
 | GET | `/health` | Verifica se a API e o banco estão no ar |
 | POST | `/auth/login` | Login: devolve o token JWT (5 tentativas/min) |
 | GET / PATCH | `/auth/me` · `/auth/senha` | Quem sou eu · trocar senha 🔒 |
+| POST | `/auth/esqueci-senha` · `/auth/redefinir-senha` | Pedir link por e-mail · criar senha nova com o código |
 | POST / GET / DELETE | `/usuarios` | Cadastrar lojistas e admins 🔒 só ADMIN |
 | POST / GET | `/lojas` | Cadastrar / listar lojas (`?bairro=` slug) |
 | GET | `/lojas/slug/:slug` | Perfil da loja pelo slug |
