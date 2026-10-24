@@ -19,11 +19,13 @@ API REST do projeto **Ache em Petrolina**, feita com **NestJS** + **Prisma ORM**
 
 Pré-requisitos: **Node.js 24+** e **Docker Desktop** aberto.
 
+> Este app faz parte dos **npm workspaces** do repositório: o `npm install` é feito na **raiz**. Da raiz também dá para usar `npm run dev:backend`, `build:backend`, `test:backend`, `lint:backend`, `db:up` e `db:down`.
+
 ```bash
 cd apps/backend
 
-# 1. Instalar dependências (já roda o "prisma generate" sozinho)
-npm install
+# 1. Instalar dependências NA RAIZ do repositório (já roda o "prisma generate")
+npm install --prefix ../..
 
 # 2. Criar o arquivo de variáveis de ambiente
 cp .env.example .env
@@ -120,4 +122,11 @@ apps/backend/
 
 ## Documentação detalhada
 
-Explicação passo a passo do que foi feito e por quê: [`docs/`](docs/).
+Índice completo, linha do tempo e situação atual em [`docs/README.md`](docs/README.md):
+
+- [01 — Inicialização](docs/01-inicializacao-nest-prisma.md)
+- [02 — Módulos e CRUDs](docs/02-modulos-crud.md)
+- [03 — Entendendo os módulos](docs/03-entendendo-os-modulos.md) (guia de estudo)
+- [04 — Integração com o monorepo](docs/04-integracao-monorepo.md)
+- [05 — Segurança](docs/05-seguranca.md)
+- [06 — Análise do front e próximos passos](docs/06-analise-front-e-proximos-passos.md)
