@@ -210,7 +210,7 @@ export class ReservasService {
 
 **Por que precisa existir:**
 - **Regra num lugar só:** a regra "não reserva esgotado" está **só aqui**. Se mudar, muda num lugar.
-- **Testável:** dá pra testar o service sem servidor e sem banco, passando um Prisma "de mentira" (mock). Foi o que fizemos em `reservas.service.spec.ts`: 11 testes das regras de reserva rodando em menos de 1 segundo.
+- **Testável:** dá pra testar o service sem servidor e sem banco, passando um Prisma "de mentira" (mock). Foi o que fizemos em `reservas.service.spec.ts`: 10 testes das regras de reserva rodando em menos de 1 segundo.
 - **Reutilizável:** outro service pode chamar este. Ex: um futuro módulo de relatórios pode usar o `ReservasService`.
 
 `@Injectable()`: avisa ao Nest "esta classe pode ser injetada em outras".
