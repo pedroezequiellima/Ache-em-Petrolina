@@ -11,6 +11,7 @@
 |---|---|---|
 | **Validação de toda entrada** | Cada rota tem um DTO com regras (tipo, tamanho, formato). Dado inválido volta com 400 antes de chegar no service | `dto/*.dto.ts` + `ValidationPipe` em `main.ts` |
 | **Campos extras recusados** | `whitelist` + `forbidNonWhitelisted`: ninguém consegue mandar `"status":"RETIRADA"` ao criar uma reserva | `main.ts` |
+| **Fotos e logos validados** | Só aceita `https://...` ou caminho que começa com `/`. Um endereço como `javascript:alert(1)` é recusado (400) | `common/validators/url-ou-caminho.ts` |
 | **IDs validados** | `ParseIntPipe`: `/produtos/abc` volta 400, não chega no banco | controllers |
 | **SQL Injection** | O Prisma monta as consultas com parâmetros, nunca concatenando texto. O único SQL manual (`SELECT 1` do health) usa template seguro | services, `app.controller.ts` |
 | **Erros não vazam detalhes** | O `PrismaExceptionFilter` devolve mensagens genéricas (404/409/500), sem nome de tabela nem stack trace | `common/filters/` |

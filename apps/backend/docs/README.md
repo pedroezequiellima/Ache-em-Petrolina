@@ -13,6 +13,7 @@ Responsável: Daniel · Issues [#5](https://github.com/pedroezequiellima/Ache-em
 | [04 — Integração com o monorepo](04-integracao-monorepo.md) | Rebase na `main`, mudança para `apps/backend`, porta 3001, CORS, scripts | Entender o Git e o PR |
 | [05 — Segurança](05-seguranca.md) | O que está protegido e o que falta | Revisão de segurança |
 | [06 — Análise do front](06-analise-front-e-proximos-passos.md) | O que o front precisa da API e o plano | Próximos passos |
+| [07 — Banco e API no formato do front](07-integracao-com-o-front.md) | Bairros, horários, slugs, seed, busca com relevância, como o front troca os mocks | **Para o pessoal do front** |
 
 Requisições prontas para testar: [`../requests.http`](../requests.http) (extensão REST Client do VS Code).
 Como rodar: [`../README.md`](../README.md).
@@ -29,24 +30,27 @@ Como rodar: [`../README.md`](../README.md).
 | 24/10 | Rebase na `main`, backend movido para `apps/backend`, API na porta 3001, CORS restrito, scripts na raiz | `refactor(backend): move a API para apps/backend no monorepo` |
 | 24/10 | Docs de integração, segurança e análise do front | `docs(backend): documenta integração, segurança e análise do front` |
 | 24/10 | `.gitattributes` (LF), lock da raiz com o backend, remoção do `@nestjs/mau`, checklist verde | `chore: força LF no Git, inclui o backend no lock...` |
+| 24/10 | **PR #12 juntado na `main`** (merge feito pelo Daniel no GitHub) | `Merge pull request #12` |
+| 24/10 | Banco no formato do front (bairros, horários, slugs), seed com os dados do front, busca com relevância, Swagger sem plugin | `feat(backend): alinha banco e API ao modelo do front` |
 
 ## Situação atual
 
 | Item | Status |
 |---|---|
-| #5 Inicializar API | ✅ Pronto (local, falta PR) |
-| #11 Módulos CRUD | ✅ Pronto (local, falta PR) |
+| #5 Inicializar API | ✅ Na `main` (PR #12) |
+| #11 Módulos CRUD | ✅ Na `main` (PR #12) |
 | Modelagem do banco (parte da #6) | ✅ Pronto |
 | Testes depois da mudança de pasta | ✅ Tudo passando (front e back) |
 | `package-lock.json` da raiz | ✅ Atualizado |
 | `npm audit` | ⚠️ 1 pendência (multer, não afeta: sem upload) |
-| Push e Pull Request | ⏳ Aguardando |
-| Ajuste do banco ao modelo do front | 📋 Planejado (doc 06) |
-| Seed com dados do front | 📋 Planejado |
+| Push e Pull Request | ✅ PR #12 juntado |
+| Ajuste do banco ao modelo do front | ✅ Pronto (doc 07) |
+| Seed com dados do front | ✅ 8 lojas e 30 produtos |
+| Busca com relevância no back | ✅ Pronto |
 | Login e proteção das reservas | 📋 Planejado (doc 05) |
 
 ## Números
 
-- **4** tabelas · **4** módulos · **20** rotas nos módulos + `/health` e `/docs`
-- **15** testes unitários + 1 e2e · build e lint de front e back passando (24/10)
+- **6** tabelas · **5** módulos · **27** rotas nos módulos + `/health` e `/docs`
+- **23** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed (24/10)
 - Portas: front **3000** · API **3001** · Postgres **5433**

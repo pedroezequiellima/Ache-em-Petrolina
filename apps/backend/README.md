@@ -36,7 +36,10 @@ npm run db:up
 # 4. Criar as tabelas no banco
 npx prisma migrate dev
 
-# 5. Rodar a API em modo desenvolvimento (reinicia ao salvar)
+# 5. Carregar os dados de exemplo (8 lojas e 30 produtos do front)
+npm run db:seed
+
+# 6. Rodar a API em modo desenvolvimento (reinicia ao salvar)
 npm run start:dev
 ```
 
@@ -59,6 +62,7 @@ curl http://localhost:3001/health
 | `npm run db:up` / `db:down` | Sobe / derruba o Postgres no Docker |
 | `npm run prisma:generate` | Gera o Prisma Client a partir do schema |
 | `npm run prisma:migrate` | Cria e aplica migrations no banco |
+| `npm run db:seed` | Carrega os dados de exemplo (pode rodar de novo) |
 | `npm run prisma:studio` | Abre um painel visual do banco no navegador |
 
 ## Variáveis de ambiente
@@ -83,11 +87,15 @@ Documentação interativa (Swagger): **http://localhost:3001/docs**. Exemplos pr
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/health` | Verifica se a API e o banco estão no ar |
-| POST / GET | `/lojas` | Cadastrar / listar lojas (`?bairro=`) |
+| POST / GET | `/lojas` | Cadastrar / listar lojas (`?bairro=` slug) |
+| GET | `/lojas/slug/:slug` | Perfil da loja pelo slug |
+| POST / GET | `/bairros` | Criar / listar bairros (`?comLojas=true`) |
+| GET / PATCH / DELETE | `/bairros/:id` | Ver / editar / remover |
 | GET / PATCH / DELETE | `/lojas/:id` | Perfil (com produtos) / editar / remover |
 | POST / GET | `/categorias` | Criar / listar categorias |
 | GET / PATCH / DELETE | `/categorias/:id` | Ver / editar / remover |
-| POST / GET | `/produtos` | Cadastrar / catálogo (`?busca=&bairro=&categoria=&lojaId=&statusEstoque=&precoMin=&precoMax=`) |
+| POST / GET | `/produtos` | Cadastrar / catálogo (`?q=&categoria=&bairro=&comEstoque=&ordem=&destaque=&lojaId=&exceto=&limite=`) |
+| GET | `/produtos/slug/:slug` | Página do produto |
 | GET / PATCH / DELETE | `/produtos/:id` | Detalhes / editar / remover |
 | PATCH | `/produtos/:id/estoque` | Mudar status de estoque |
 | POST / GET | `/reservas` | Criar reserva / listar (`?status=&lojaId=&produtoId=`) |
@@ -130,3 +138,4 @@ apps/backend/
 - [04 — Integração com o monorepo](docs/04-integracao-monorepo.md)
 - [05 — Segurança](docs/05-seguranca.md)
 - [06 — Análise do front e próximos passos](docs/06-analise-front-e-proximos-passos.md)
+- [07 — Banco e API no formato do front](docs/07-integracao-com-o-front.md)

@@ -172,7 +172,7 @@ export class ProdutosController {
 
 **O que faz:** só cuida da parte **HTTP**:
 - define **quais URLs existem** (`@Get`, `@Post`, `@Patch`, `@Delete`);
-- **pega os dados** da requisição: `@Body()` (corpo JSON), `@Param()` (o `5` em `/produtos/5`), `@Query()` (o `?busca=vestido`);
+- **pega os dados** da requisição: `@Body()` (corpo JSON), `@Param()` (o `5` em `/produtos/5`), `@Query()` (o `?q=vestido`);
 - chama o service e **devolve a resposta**.
 
 **O que ele NÃO faz:** regra de negócio nem acesso ao banco. Repara que cada método tem **uma linha só**: ele repassa para o service.
@@ -251,7 +251,7 @@ export class CreateReservaDto {
 |---|---|---|
 | `create-produto.dto.ts` | `POST /produtos` | Para criar, `nome`, `preco`, `lojaId` e `categoriaId` são **obrigatórios** |
 | `update-produto.dto.ts` | `PATCH /produtos/:id` | Para editar, você manda **só o que mudou**. Tudo vira opcional |
-| `filtro-produtos.dto.ts` | `GET /produtos?...` | Os filtros da busca (`busca`, `bairro`, `precoMax`...), todos opcionais |
+| `filtro-produtos.dto.ts` | `GET /produtos?...` | Os filtros da busca (`q`, `bairro`, `ordem`, `precoMax`...), todos opcionais |
 | `atualizar-estoque.dto.ts` | `PATCH /produtos/:id/estoque` | Aceita **apenas** o `statusEstoque` (e só os 3 valores válidos) |
 
 O `UpdateProdutoDto` é uma linha só:

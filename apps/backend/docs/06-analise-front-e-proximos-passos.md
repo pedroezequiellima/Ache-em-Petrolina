@@ -1,5 +1,7 @@
 # 06 — Análise do front e próximos passos
 
+> ✅ **Atualizado em 24/10:** os passos 1 a 4 foram feitos. Ver [doc 07](07-integracao-com-o-front.md) com as rotas finais.
+
 > Análise feita em 24/10/2026, lendo o código de `apps/frontend` que entrou na `main`.
 
 ## Como o front está hoje
@@ -21,12 +23,12 @@ Funções que a API precisa atender:
 
 | Função do front | Rota da API que vai responder |
 |---|---|
-| `searchProducts(filtros)` | `GET /produtos?q=&categoria=&bairro=&estoque=&ordem=` |
-| `getProductBySlug(slug)` | `GET /produtos/slug/:slug` (a criar) |
-| `getFeaturedProducts(8)` | `GET /produtos?destaque=true&limite=8` (a criar) |
-| `getStoreProducts(loja, exceto)` | `GET /produtos?lojaId=...` |
+| `searchProducts(filtros)` | `GET /produtos?q=&categoria=&bairro=&comEstoque=&ordem=` ✅ |
+| `getProductBySlug(slug)` | `GET /produtos/slug/:slug` ✅ |
+| `getFeaturedProducts(8)` | `GET /produtos?destaque=true&limite=8` ✅ |
+| `getStoreProducts(loja, exceto)` | `GET /produtos?lojaId=&exceto=&limite=` ✅ |
 | `getCategories()` | `GET /categorias` |
-| `getNeighborhoodsWithStores()` | `GET /bairros` (a criar) |
+| `getNeighborhoodsWithStores()` | `GET /bairros?comLojas=true` ✅ |
 
 ## O que não bate entre front e back
 

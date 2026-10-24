@@ -1,5 +1,7 @@
 # 02 — Modelagem do banco e módulos da API (CRUDs)
 
+> ⚠️ **Atualizado em 24/10:** o banco e os filtros mudaram para o formato do front (tabela de bairros, horários, slugs, busca com `q` e relevância). Este doc mostra a **primeira versão**; o que mudou está no [doc 07](07-integracao-com-o-front.md).
+
 > **Issue:** [#11 — Back-end Módulos Principais da API (CRUDs)](https://github.com/pedroezequiellima/Ache-em-Petrolina/issues/11)
 > Inclui a parte "[Back-end/DB] Modelagem do Banco" da [#6](https://github.com/pedroezequiellima/Ache-em-Petrolina/issues/6)
 > **Branch:** `feat/backend-modules` (criada a partir de `feat/backend-init`)
@@ -10,7 +12,7 @@ Criar as tabelas do banco e os módulos da API que o front precisa:
 
 | Tela / fluxo do front | O que a API entrega |
 |---|---|
-| Tela inicial: busca por termo, filtro por bairro e categoria (#9) | `GET /produtos?busca=&bairro=&categoria=` e `GET /categorias` |
+| Tela inicial: busca por termo, filtro por bairro e categoria (#9) | `GET /produtos?q=&bairro=&categoria=` e `GET /categorias` |
 | Detalhes do produto: fotos, preço, localização, "Falar com a loja" (#9) | `GET /produtos/:id` já traz a loja com endereço, bairro e WhatsApp |
 | Formulário de reserva: Nome, WhatsApp, Quantidade + LGPD (#10) | `POST /reservas` com validação de todos os campos |
 
@@ -130,7 +132,7 @@ Removemos a pasta `entities/` que o CLI gera: com Prisma, os tipos das tabelas j
 | Método | Rota | Descrição |
 |---|---|---|
 | POST | `/lojas` | Cadastrar loja |
-| GET | `/lojas?bairro=Centro` | Listar (filtro de bairro opcional), com a contagem de produtos |
+| GET | `/lojas?bairro=centro` (slug, ver doc 07) | Listar (filtro de bairro opcional), com a contagem de produtos |
 | GET | `/lojas/:id` | Perfil da loja **com os produtos dela** |
 | PATCH | `/lojas/:id` | Editar dados / contato |
 | DELETE | `/lojas/:id` | Remover |
@@ -157,14 +159,14 @@ Não estava na issue #11, mas o front filtra por categoria e a #6 cita a tabela.
 
 | Parâmetro | Exemplo | Como funciona |
 |---|---|---|
-| `busca` | `vestido` | Procura no nome **ou** na descrição, sem diferenciar maiúscula/minúscula |
+| `q` | `vestido` | Busca por termo com relevância, sem acento (ver doc 07; antes se chamava `busca`) |
 | `bairro` | `Centro` | Bairro da loja |
 | `categoria` | `moda-feminina` | Slug da categoria |
 | `lojaId` | `1` | Produtos de uma loja |
 | `statusEstoque` | `DISPONIVEL` | Situação do estoque |
 | `precoMin` / `precoMax` | `50` / `200` | Faixa de preço |
 
-Exemplo: `GET /produtos?busca=vestido&bairro=Centro&precoMax=150`
+Exemplo: `GET /produtos?q=vestido&bairro=centro&precoMax=150`. A lista completa de filtros está no [doc 07](07-integracao-com-o-front.md).
 
 ### Reservas — `/reservas`
 | Método | Rota | Descrição |
@@ -246,7 +248,9 @@ Criamos o `PrismaExceptionFilter` (`src/common/filters/`), que transforma os err
 
 Acesse **http://localhost:3001/docs** com a API rodando. Lá aparecem todas as rotas, os campos, os exemplos, e dá pra **testar direto pelo navegador** (botão "Try it out"). É ótimo para a apresentação e para o pessoal do front ver o formato dos dados.
 
-Configurado com o plugin do `@nestjs/swagger` no `nest-cli.json`. Ele lê os DTOs e os comentários `/** @example ... */` automaticamente, sem precisar repetir a documentação.
+Cada campo dos DTOs tem um `@ApiProperty({ example, description })`, que é o que aparece no Swagger.
+
+> No começo usávamos o **plugin** do `@nestjs/swagger`, que lê os DTOs sozinho. Ele quebrou no monorepo (conflito entre o TypeScript 5 do front e o 6 do back) e foi trocado pelos decorators explícitos. Ver doc 07, problema 5.
 
 ## 8. CORS
 
@@ -256,7 +260,7 @@ Configurado com o plugin do `@nestjs/swagger` no `nest-cli.json`. Ele lê os DTO
 
 ## 9. Testes
 
-**Unitários** (`npm test`): 15 testes, com o Prisma "mockado" (simulado, sem banco):
+**Unitários** (`npm test`): 15 testes nesta primeira versão (23 depois do doc 07), com o Prisma "mockado" (simulado, sem banco):
 - `reservas.service.spec.ts`: prazo de 24h, bloqueio de produto esgotado, 3 transições permitidas, 4 transições bloqueadas, expiração automática.
 - `slugify.spec.ts`: geração de slug com acentos e símbolos.
 - `app.controller.spec.ts`: rotas `/` e `/health`.
@@ -284,6 +288,6 @@ Configurado com o plugin do `@nestjs/swagger` no `nest-cli.json`. Ele lê os DTO
 | Sem paginação por enquanto | Poucos produtos no MVP; fácil de adicionar se o catálogo crescer |
 
 ## Próximos passos
-- Seed com 5 lojas e 15 produtos de Petrolina (#6).
+- ~~Seed com 5 lojas e 15 produtos de Petrolina (#6).~~ Feito com os 8 lojas e 30 produtos do front (doc 07).
 - Ajustar campos/filtros conforme o front for integrado.
 - Autenticação para as rotas de gestão da loja (criar/editar produtos, mudar status de reserva), que hoje estão abertas.

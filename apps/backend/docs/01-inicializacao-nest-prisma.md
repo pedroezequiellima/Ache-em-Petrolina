@@ -12,7 +12,7 @@ Criar a base do backend na pasta `/backend`, com NestJS, e deixar o Prisma ORM c
 ## Conceitos (o que é cada coisa)
 
 ### O que é uma API?
-É o "garçom" entre o front e o banco de dados. O front (Next.js) faz um pedido (`GET /produtos?bairro=Centro`), a API busca no banco e devolve os dados em JSON. O front **nunca** acessa o banco direto — isso garante segurança e regras de negócio centralizadas.
+É o "garçom" entre o front e o banco de dados. O front (Next.js) faz um pedido (`GET /produtos?bairro=centro`), a API busca no banco e devolve os dados em JSON. O front **nunca** acessa o banco direto — isso garante segurança e regras de negócio centralizadas.
 
 ### Por que NestJS?
 NestJS é um framework Node.js que **impõe uma organização**. Em vez de cada um do grupo organizar o código de um jeito, o Nest define um padrão:
