@@ -26,22 +26,51 @@ enum StatusReserva {
   EXPIRADA
 }
 
-model Loja {
-  id           Int       @id @default(autoincrement())
-  nome         String
-  descricao    String?
-  whatsapp     String // Só dígitos com DDI+DDD, ex: 5587999999999 (usado no link wa.me)
-  email        String?
-  instagram    String?
-  endereco     String
-  bairro       String
-  logoUrl      String?
-  produtos     Produto[]
-  criadoEm     DateTime  @default(now())
-  atualizadoEm DateTime  @updatedAt
+model Bairro {
+  id    Int    @id @default(autoincrement())
+  nome  String @unique
+  slug  String @unique // Usado no filtro do front, ex: "areia-branca"
+  lojas Loja[]
 
-  @@index([bairro])
+  @@map("bairros")
+}
+
+model Loja {
+  id              Int           @id @default(autoincrement())
+  slug            String        @unique
+  nome            String
+  descricao       String?
+  whatsapp        String // Só dígitos com DDI+DDD, ex: 5587999999999 (usado no link wa.me)
+  telefone        String?
+  email           String?
+  instagram       String?
+  endereco        String
+  cep             String?
+  bairroId        Int
+  bairro          Bairro        @relation(fields: [bairroId], references: [id], onDelete: Restrict)
+  logoUrl         String?
+  avaliacao       Float? // Nota média, ex: 4.7
+  totalAvaliacoes Int           @default(0)
+  horarios        HorarioLoja[]
+  produtos        Produto[]
+  criadoEm        DateTime      @default(now())
+  atualizadoEm    DateTime      @updatedAt
+
+  @@index([bairroId])
   @@map("lojas")
+}
+
+// Um registro por dia em que a loja abre. Dia sem registro = fechado.
+model HorarioLoja {
+  id        Int    @id @default(autoincrement())
+  lojaId    Int
+  loja      Loja   @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  diaSemana Int // 0 = domingo ... 6 = sábado (mesmo padrão do JavaScript)
+  abre      String // "08:00"
+  fecha     String // "18:00"
+
+  @@unique([lojaId, diaSemana])
+  @@map("horarios_loja")
 }
 
 model Categoria {
@@ -55,10 +84,16 @@ model Categoria {
 
 model Produto {
   id            Int           @id @default(autoincrement())
+  slug          String        @unique // Usado na URL do front: /produto/<slug>
   nome          String
+  marca         String?
   descricao     String?
+  detalhes      String[] // Linhas tipo "Tamanhos: 38 ao 44"
   preco         Decimal       @db.Decimal(10, 2)
-  fotos         String[] // URLs das imagens
+  precoAntigo   Decimal?      @db.Decimal(10, 2) // Preço "de" riscado, quando há promoção
+  fotos         String[] // URLs ou caminhos (ex: /mock/calcados-1.svg)
+  tags          String[] // Palavras extras para a busca
+  destaque      Boolean       @default(false)
   statusEstoque StatusEstoque @default(DISPONIVEL)
   lojaId        Int
   loja          Loja          @relation(fields: [lojaId], references: [id], onDelete: Cascade)

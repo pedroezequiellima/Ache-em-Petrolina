@@ -1,41 +1,72 @@
 import { Injectable } from '@nestjs/common';
+import { slugify } from '../common/utils/slugify.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateLojaDto } from './dto/create-loja.dto.js';
 import { UpdateLojaDto } from './dto/update-loja.dto.js';
+
+const HORARIOS = { orderBy: { diaSemana: 'asc' as const } };
+
+// Perfil da loja com seus produtos
+const PERFIL = {
+  bairro: true,
+  horarios: HORARIOS,
+  produtos: {
+    include: { categoria: true },
+    orderBy: { criadoEm: 'desc' as const },
+  },
+};
 
 @Injectable()
 export class LojasService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateLojaDto) {
-    return this.prisma.loja.create({ data: dto });
+  create({ horarios, ...dto }: CreateLojaDto) {
+    return this.prisma.loja.create({
+      data: {
+        ...dto,
+        slug: dto.slug ?? slugify(dto.nome),
+        horarios: horarios ? { create: horarios } : undefined,
+      },
+      include: { bairro: true, horarios: HORARIOS },
+    });
   }
 
-  findAll(bairro?: string) {
+  findAll(bairroSlug?: string) {
     return this.prisma.loja.findMany({
-      where: bairro
-        ? { bairro: { equals: bairro, mode: 'insensitive' } }
-        : undefined,
-      include: { _count: { select: { produtos: true } } },
+      where: bairroSlug ? { bairro: { slug: bairroSlug } } : undefined,
+      include: {
+        bairro: true,
+        horarios: HORARIOS,
+        _count: { select: { produtos: true } },
+      },
       orderBy: { nome: 'asc' },
     });
   }
 
-  // Perfil da loja com seus produtos
   findOne(id: number) {
     return this.prisma.loja.findUniqueOrThrow({
       where: { id },
-      include: {
-        produtos: {
-          include: { categoria: true },
-          orderBy: { criadoEm: 'desc' },
-        },
-      },
+      include: PERFIL,
     });
   }
 
-  update(id: number, dto: UpdateLojaDto) {
-    return this.prisma.loja.update({ where: { id }, data: dto });
+  findBySlug(slug: string) {
+    return this.prisma.loja.findUniqueOrThrow({
+      where: { slug },
+      include: PERFIL,
+    });
+  }
+
+  // Se vier "horarios", a lista nova substitui a antiga
+  update(id: number, { horarios, ...dto }: UpdateLojaDto) {
+    return this.prisma.loja.update({
+      where: { id },
+      data: {
+        ...dto,
+        horarios: horarios ? { deleteMany: {}, create: horarios } : undefined,
+      },
+      include: { bairro: true, horarios: HORARIOS },
+    });
   }
 
   remove(id: number) {

@@ -1,0 +1,320 @@
+[
+  {
+    "id": "loja-1",
+    "slug": "passo-certo-calcados",
+    "name": "Passo Certo Calçados",
+    "neighborhoodSlug": "centro",
+    "address": "Av. Souza Filho, 512",
+    "cep": "56304-000",
+    "whatsapp": "5587900000001",
+    "phone": "(87) 3861-0001",
+    "hours": [
+      null,
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "13:00"
+      }
+    ],
+    "rating": 4.7,
+    "reviewCount": 128
+  },
+  {
+    "id": "loja-2",
+    "slug": "vale-tech-eletronicos",
+    "name": "Vale Tech Eletrônicos",
+    "neighborhoodSlug": "centro",
+    "address": "Rua Pacífico da Luz, 230",
+    "cep": "56304-010",
+    "whatsapp": "5587900000002",
+    "phone": "(87) 3861-0002",
+    "hours": [
+      null,
+      {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      {
+        "open": "09:00",
+        "close": "19:00"
+      },
+      {
+        "open": "09:00",
+        "close": "14:00"
+      }
+    ],
+    "rating": 4.5,
+    "reviewCount": 86
+  },
+  {
+    "id": "loja-3",
+    "slug": "casa-sertao-utilidades",
+    "name": "Casa Sertão Utilidades",
+    "neighborhoodSlug": "areia-branca",
+    "address": "Av. das Nações, 845",
+    "cep": "56330-000",
+    "whatsapp": "5587900000003",
+    "phone": "(87) 3862-0003",
+    "hours": [
+      null,
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "13:00"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 64
+  },
+  {
+    "id": "loja-4",
+    "slug": "constroi-facil-materiais",
+    "name": "Constrói Fácil Materiais",
+    "neighborhoodSlug": "vila-eduardo",
+    "address": "Av. Cardoso de Sá, 1490",
+    "cep": "56328-020",
+    "whatsapp": "5587900000004",
+    "phone": "(87) 3863-0004",
+    "hours": [
+      null,
+      {
+        "open": "07:00",
+        "close": "17:30"
+      },
+      {
+        "open": "07:00",
+        "close": "17:30"
+      },
+      {
+        "open": "07:00",
+        "close": "17:30"
+      },
+      {
+        "open": "07:00",
+        "close": "17:30"
+      },
+      {
+        "open": "07:00",
+        "close": "17:30"
+      },
+      {
+        "open": "07:00",
+        "close": "12:00"
+      }
+    ],
+    "rating": 4.6,
+    "reviewCount": 203
+  },
+  {
+    "id": "loja-5",
+    "slug": "amigo-pet-petrolina",
+    "name": "Amigo Pet Petrolina",
+    "neighborhoodSlug": "jardim-maravilha",
+    "address": "Rua do Sol, 77",
+    "cep": "56310-030",
+    "whatsapp": "5587900000005",
+    "phone": "(87) 3864-0005",
+    "hours": [
+      {
+        "open": "08:00",
+        "close": "12:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      }
+    ],
+    "rating": 4.9,
+    "reviewCount": 152
+  },
+  {
+    "id": "loja-6",
+    "slug": "farmacia-vida-vale",
+    "name": "Farmácia Vida Vale",
+    "neighborhoodSlug": "gercino-coelho",
+    "address": "Rua São Francisco, 1020",
+    "cep": "56306-040",
+    "whatsapp": "5587900000006",
+    "phone": "(87) 3865-0006",
+    "hours": [
+      {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      {
+        "open": "07:00",
+        "close": "22:00"
+      },
+      {
+        "open": "07:00",
+        "close": "22:00"
+      }
+    ],
+    "rating": 4.4,
+    "reviewCount": 311
+  },
+  {
+    "id": "loja-7",
+    "slug": "atelie-presentes-e-cia",
+    "name": "Ateliê Presentes & Cia",
+    "neighborhoodSlug": "maria-auxiliadora",
+    "address": "Rua das Flores, 318",
+    "cep": "56309-050",
+    "whatsapp": "5587900000007",
+    "phone": "(87) 3866-0007",
+    "hours": [
+      null,
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "18:00"
+      },
+      {
+        "open": "08:00",
+        "close": "13:00"
+      }
+    ],
+    "rating": 4.8,
+    "reviewCount": 97
+  },
+  {
+    "id": "loja-8",
+    "slug": "auto-pecas-rota-407",
+    "name": "Auto Peças Rota 407",
+    "neighborhoodSlug": "jose-e-maria",
+    "address": "Av. Sete de Setembro, 2100",
+    "cep": "56320-060",
+    "whatsapp": "5587900000008",
+    "phone": "(87) 3867-0008",
+    "hours": [
+      null,
+      {
+        "open": "07:30",
+        "close": "18:00"
+      },
+      {
+        "open": "07:30",
+        "close": "18:00"
+      },
+      {
+        "open": "07:30",
+        "close": "18:00"
+      },
+      {
+        "open": "07:30",
+        "close": "18:00"
+      },
+      {
+        "open": "07:30",
+        "close": "18:00"
+      },
+      {
+        "open": "07:30",
+        "close": "12:30"
+      }
+    ],
+    "rating": 4.3,
+    "reviewCount": 74
+  }
+]

@@ -1,43 +1,62 @@
 ### Requisições de exemplo da API — Ache em Petrolina
 ### Use com a extensão "REST Client" do VS Code: clique em "Send Request" acima de cada uma.
+### Antes: npm run db:up && npm run db:seed (carrega as 8 lojas e 30 produtos do front)
 
 @api = http://localhost:3001
 
 ### Health check
 GET {{api}}/health
 
-### ===================== CATEGORIAS =====================
+### ================= CATÁLOGO (o que o front usa) =================
 
-### Criar categoria (slug é gerado sozinho)
-POST {{api}}/categorias
-Content-Type: application/json
+### Busca por termo (ignora acento e plural): igual a /busca?q= do front
+GET {{api}}/produtos?q=tenis nike 42
 
-{ "nome": "Moda Feminina" }
+### Filtros combinados: bairro + categoria + só com estoque + menor preço
+GET {{api}}/produtos?bairro=centro&categoria=calcados&comEstoque=1&ordem=menor-preco
 
-### Listar categorias
+### Destaques da home
+GET {{api}}/produtos?destaque=true&limite=8
+
+### Página do produto (pelo slug da URL do front)
+GET {{api}}/produtos/slug/tenis-nike-revolution-7-masculino
+
+### "Mais produtos desta loja"
+GET {{api}}/produtos?lojaId=1&exceto=tenis-nike-revolution-7-masculino&limite=4
+
+### Categorias (com quantidade de produtos)
 GET {{api}}/categorias
 
-### ======================== LOJAS ========================
+### Bairros que têm loja (seção da home)
+GET {{api}}/bairros?comLojas=true
 
-### Criar loja
+### Perfil da loja pelo slug
+GET {{api}}/lojas/slug/passo-certo-calcados
+
+### ===================== CADASTROS =====================
+
+### Criar bairro (slug é gerado sozinho)
+POST {{api}}/bairros
+Content-Type: application/json
+
+{ "nome": "Vila Mocó" }
+
+### Criar loja (bairroId vem de GET /bairros)
 POST {{api}}/lojas
 Content-Type: application/json
 
 {
   "nome": "Boutique Sol do Sertão",
-  "descricao": "Moda feminina e acessórios",
-  "whatsapp": "5587999990001",
+  "whatsapp": "5587900000099",
+  "telefone": "(87) 3861-0099",
   "endereco": "Av. Souza Filho, 123",
-  "bairro": "Centro"
+  "cep": "56304-000",
+  "bairroId": 1,
+  "horarios": [
+    { "diaSemana": 1, "abre": "08:00", "fecha": "18:00" },
+    { "diaSemana": 6, "abre": "08:00", "fecha": "12:00" }
+  ]
 }
-
-### Listar lojas do Centro
-GET {{api}}/lojas?bairro=Centro
-
-### Perfil da loja com produtos
-GET {{api}}/lojas/1
-
-### ======================= PRODUTOS =======================
 
 ### Criar produto
 POST {{api}}/produtos
@@ -45,18 +64,16 @@ Content-Type: application/json
 
 {
   "nome": "Vestido Midi Floral",
-  "descricao": "Tecido leve, tamanhos P ao GG",
+  "marca": "Sol do Sertão",
+  "descricao": "Tecido leve, ideal para o calor",
+  "detalhes": ["Tamanhos: P ao GG"],
   "preco": 129.9,
-  "fotos": ["https://exemplo.com/vestido.jpg"],
+  "precoAntigo": 159.9,
+  "fotos": ["/mock/moda-1.svg"],
+  "tags": ["vestido", "verao"],
   "lojaId": 1,
   "categoriaId": 1
 }
-
-### Catálogo com busca e filtros
-GET {{api}}/produtos?busca=vestido&bairro=Centro&categoria=moda-feminina
-
-### Detalhes do produto
-GET {{api}}/produtos/1
 
 ### Mudar estoque
 PATCH {{api}}/produtos/1/estoque
@@ -95,14 +112,17 @@ Content-Type: application/json
 
 { "nomeCliente": "", "whatsappCliente": "abc", "quantidade": 0, "aceiteLgpd": false, "produtoId": 1, "hacker": true }
 
-### 400 — transição de status proibida (rode depois de RETIRADA)
-PATCH {{api}}/reservas/1/status
+### 400 — foto com endereço perigoso
+POST {{api}}/produtos
 Content-Type: application/json
 
-{ "status": "NOVA" }
+{ "nome": "X", "preco": 1, "lojaId": 1, "categoriaId": 1, "fotos": ["javascript:alert(1)"] }
 
-### 404 — não existe
-GET {{api}}/produtos/999
+### 400 — ordenação que não existe
+GET {{api}}/produtos?ordem=aleatorio
+
+### 404 — produto que não existe
+GET {{api}}/produtos/slug/nao-existe
 
 ### 409 — categoria com produtos não pode ser apagada
 DELETE {{api}}/categorias/1

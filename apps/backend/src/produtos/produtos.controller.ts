@@ -26,10 +26,16 @@ export class ProdutosController {
     return this.produtosService.create(dto);
   }
 
-  // Ex: GET /produtos?busca=vestido&bairro=Centro&categoria=moda-feminina
+  // Ex: GET /produtos?q=tenis&bairro=centro&categoria=calcados&ordem=menor-preco
   @Get()
   findAll(@Query() filtro: FiltroProdutosDto) {
     return this.produtosService.findAll(filtro);
+  }
+
+  // Declarada antes de ":id" para "slug" não ser lido como um id
+  @Get('slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.produtosService.findBySlug(slug);
   }
 
   @Get(':id')

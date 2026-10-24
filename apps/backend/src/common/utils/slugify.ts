@@ -2,7 +2,7 @@
 export function slugify(texto: string): string {
   return texto
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '') // remove acentos
+    .replace(/\p{M}/gu, '') // remove acentos (\p{M} = marcas de acento separadas pelo NFD)
     .toLowerCase()
     .trim()
     .replace(/[^a-z0-9]+/g, '-')

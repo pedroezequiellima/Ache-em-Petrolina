@@ -25,9 +25,15 @@ export class LojasController {
   }
 
   @Get()
-  @ApiQuery({ name: 'bairro', required: false, example: 'Centro' })
+  @ApiQuery({ name: 'bairro', required: false, example: 'centro' })
   findAll(@Query('bairro') bairro?: string) {
     return this.lojasService.findAll(bairro);
+  }
+
+  // Declarada antes de ":id" para "slug" não ser lido como um id
+  @Get('slug/:slug')
+  findBySlug(@Param('slug') slug: string) {
+    return this.lojasService.findBySlug(slug);
   }
 
   @Get(':id')
