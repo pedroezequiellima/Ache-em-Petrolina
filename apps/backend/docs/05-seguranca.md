@@ -60,7 +60,16 @@ O que fazer: só ativar o Swagger quando `NODE_ENV !== 'production'`.
 
 **8. Retenção de dados (LGPD):** definir por quanto tempo guardar nome e WhatsApp de reservas antigas (ex: anonimizar depois de 90 dias).
 
-**9. `npm audit`:** ainda não rodamos a verificação de vulnerabilidades nas dependências do backend. Fazer junto com o `npm install` da raiz.
+**9. `npm audit` (rodado em 24/10/2026).** Resultado e o que fizemos:
+
+| Pacote | Gravidade | O que era | O que fizemos |
+|---|---|---|---|
+| `@nestjs/mau` (+ `inquirer`, `tmp`, `undici`, `external-editor`) | alta/moderada/baixa | Ferramenta de deploy na nuvem do Nest, veio no projeto gerado e **não é usada** | **Removida**, junto com o script `deploy`. Sumiram 5 alertas |
+| `multer` 2.4.0 (via `@nestjs/platform-express`) | alta | Permite derrubar o servidor (DoS) **durante upload de arquivo** | **Pendente.** A API não tem upload, então hoje não é explorável. O Nest fixa a versão exata 2.4.0; tentamos forçar a 2.5.0 com `overrides` do npm, mas ele não aplica em workspaces. Aguardar o Nest atualizar |
+
+> ⚠️ **Não rode `npm audit fix --force`.** Ele "resolve" rebaixando o Nest para a versão 11 e quebra o projeto.
+
+Os 4 alertas que sobram são todos a mesma falha do `multer`, contada em cada pacote que depende dele.
 
 **10. HTTPS:** em produção, a API deve ficar atrás de um proxy (Nginx) com HTTPS. Isso é parte da infraestrutura (#8).
 

@@ -28,6 +28,7 @@ Como rodar: [`../README.md`](../README.md).
 | 24/10 | Grupo sobe o front e reorganiza em monorepo (`apps/`) | (commits do grupo) |
 | 24/10 | Rebase na `main`, backend movido para `apps/backend`, API na porta 3001, CORS restrito, scripts na raiz | `refactor(backend): move a API para apps/backend no monorepo` |
 | 24/10 | Docs de integração, segurança e análise do front | `docs(backend): documenta integração, segurança e análise do front` |
+| 24/10 | `.gitattributes` (LF), lock da raiz com o backend, remoção do `@nestjs/mau`, checklist verde | `chore: força LF no Git, inclui o backend no lock...` |
 
 ## Situação atual
 
@@ -36,8 +37,9 @@ Como rodar: [`../README.md`](../README.md).
 | #5 Inicializar API | ✅ Pronto (local, falta PR) |
 | #11 Módulos CRUD | ✅ Pronto (local, falta PR) |
 | Modelagem do banco (parte da #6) | ✅ Pronto |
-| Testes depois da mudança de pasta | ⏳ Falta rodar |
-| `package-lock.json` da raiz | ⏳ Falta `npm install` |
+| Testes depois da mudança de pasta | ✅ Tudo passando (front e back) |
+| `package-lock.json` da raiz | ✅ Atualizado |
+| `npm audit` | ⚠️ 1 pendência (multer, não afeta: sem upload) |
 | Push e Pull Request | ⏳ Aguardando |
 | Ajuste do banco ao modelo do front | 📋 Planejado (doc 06) |
 | Seed com dados do front | 📋 Planejado |
@@ -46,5 +48,5 @@ Como rodar: [`../README.md`](../README.md).
 ## Números
 
 - **4** tabelas · **4** módulos · **20** rotas nos módulos + `/health` e `/docs`
-- **15** testes unitários + 1 e2e (todos passando na última execução, antes da mudança de pasta)
+- **15** testes unitários + 1 e2e · build e lint de front e back passando (24/10)
 - Portas: front **3000** · API **3001** · Postgres **5433**

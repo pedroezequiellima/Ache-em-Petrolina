@@ -130,8 +130,36 @@ Regras do grupo (README da raiz): branch a partir da `main`, PR com pelo menos 1
 
 ## Checklist antes do push
 
-- [ ] `npm install` na raiz (atualiza o `package-lock.json`)
-- [ ] `npm run build:backend`, `npm run lint:backend`, `npm run test:backend`
-- [ ] `npm run build` e `npm run lint` (front, para garantir que nada quebrou)
-- [ ] Commit do lock atualizado
+- [x] `npm install` na raiz (atualiza o `package-lock.json`)
+- [x] `npm run build:backend`, `npm run lint:backend`, `npm run test:backend`
+- [x] `npm run format:check`, `npm run lint` e `npm run build` (front, para garantir que nada quebrou)
+- [x] Commit do lock atualizado
 - [ ] Push da `feat/backend` e abertura do PR
+
+Resultado da verificação (24/10/2026):
+
+| Verificação | Resultado |
+|---|---|
+| Front `format:check` | ✅ |
+| Front `lint` | ✅ |
+| Front `build` | ✅ (33 páginas geradas) |
+| Back `build` | ✅ |
+| Back `lint` | ✅ |
+| Back `test` | ✅ 15 testes |
+
+## Mais problemas resolvidos na verificação
+
+### `package-lock.json` da raiz
+Depois do `npm install`, conferimos entrada por entrada: **as 443 dependências do front ficaram exatamente nas mesmas versões**. Só foram adicionadas as do backend.
+
+> Lição aprendida: tentamos editar o `package-lock.json` na mão para forçar uma versão e o npm passou a **achar que estava tudo instalado sem estar** (o `multer` sumiu, e o `npm audit` dizia "0 vulnerabilidades" justamente porque o pacote não existia). Solução: voltar o lock para a versão da `main` e deixar o `npm install` gerar de novo. **Nunca edite o lock na mão.**
+
+### Quebra de linha no Windows (`.gitattributes`)
+**Problema:** o `npm run format:check` do front falhou em **todos** os arquivos, mesmo sem ninguém ter mexido neles.
+
+**Causa:** o Git no Windows vem com `core.autocrlf=true` e converte a quebra de linha dos arquivos de LF (Linux/Mac) para CRLF (Windows) ao baixar. O Prettier espera LF. No GitHub os arquivos estavam certos; o problema era só na máquina.
+
+**Solução:** um `.gitattributes` na raiz com `* text=auto eol=lf`, que obriga o Git a usar LF em qualquer sistema. Isso vale para todo o grupo e para o CI, e também acaba com os avisos *"LF will be replaced by CRLF"* nos commits.
+
+### Node 24.14 × 24.15
+O `npm install` avisa (`EBADENGINE`) que as ferramentas do Nest CLI pedem Node **24.15 ou mais novo**. É só aviso, tudo funciona, mas vale atualizar o Node.
