@@ -1,9 +1,18 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Test } from '@nestjs/testing';
-import { StatusEstoque, StatusReserva } from '../generated/prisma/enums.js';
+import {
+  Papel,
+  StatusEstoque,
+  StatusReserva,
+} from '../generated/prisma/enums.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { ReservasService } from './reservas.service.js';
+
+const ADMIN = { id: 1, papel: Papel.ADMIN, lojaId: null };
+const LOJISTA_1 = { id: 2, papel: Papel.LOJISTA, lojaId: 1 };
+const LOJISTA_2 = { id: 3, papel: Papel.LOJISTA, lojaId: 2 };
+const DA_LOJA_1 = { loja: { id: 1 } };
 
 describe('ReservasService', () => {
   let service: ReservasService;
@@ -11,6 +20,7 @@ describe('ReservasService', () => {
     produto: { findUniqueOrThrow: vi.fn() },
     reserva: {
       create: vi.fn(),
+      findMany: vi.fn(),
       findUniqueOrThrow: vi.fn(),
       update: vi.fn(),
       updateMany: vi.fn(),
@@ -67,9 +77,12 @@ describe('ReservasService', () => {
       [StatusReserva.NOVA, StatusReserva.CANCELADA],
       [StatusReserva.CONFIRMADA, StatusReserva.RETIRADA],
     ])('permite %s -> %s', async (atual, novo) => {
-      prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({ status: atual });
+      prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({
+        status: atual,
+        produto: DA_LOJA_1,
+      });
 
-      await service.atualizarStatus(1, novo);
+      await service.atualizarStatus(1, novo, ADMIN);
 
       expect(prismaMock.reserva.update).toHaveBeenCalled();
     });
@@ -80,9 +93,12 @@ describe('ReservasService', () => {
       [StatusReserva.CANCELADA, StatusReserva.CONFIRMADA],
       [StatusReserva.EXPIRADA, StatusReserva.CONFIRMADA],
     ])('bloqueia %s -> %s', async (atual, novo) => {
-      prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({ status: atual });
+      prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({
+        status: atual,
+        produto: DA_LOJA_1,
+      });
 
-      await expect(service.atualizarStatus(1, novo)).rejects.toThrow(
+      await expect(service.atualizarStatus(1, novo, ADMIN)).rejects.toThrow(
         BadRequestException,
       );
       expect(prismaMock.reserva.update).not.toHaveBeenCalled();
@@ -90,9 +106,11 @@ describe('ReservasService', () => {
   });
 
   it('expira reservas abertas vencidas antes de listar', async () => {
-    prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({});
+    prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({
+      produto: DA_LOJA_1,
+    });
 
-    await service.findOne(1);
+    await service.findOne(1, ADMIN);
 
     const { where, data } = prismaMock.reserva.updateMany.mock.calls[0][0];
     expect(where.status.in).toEqual([
@@ -100,5 +118,43 @@ describe('ReservasService', () => {
       StatusReserva.CONFIRMADA,
     ]);
     expect(data.status).toBe(StatusReserva.EXPIRADA);
+  });
+
+  describe('permissões (LGPD)', () => {
+    it('lojista só lista as reservas da própria loja, mesmo pedindo outra', async () => {
+      await service.findAll({ lojaId: 2 }, LOJISTA_1);
+
+      const { where } = prismaMock.reserva.findMany.mock.calls[0][0];
+      expect(where.produto).toEqual({ lojaId: 1 });
+    });
+
+    it('admin pode filtrar qualquer loja', async () => {
+      await service.findAll({ lojaId: 2 }, ADMIN);
+
+      const { where } = prismaMock.reserva.findMany.mock.calls[0][0];
+      expect(where.produto).toEqual({ lojaId: 2 });
+    });
+
+    it('lojista de outra loja não vê a reserva (403)', async () => {
+      prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({
+        produto: DA_LOJA_1,
+      });
+
+      await expect(service.findOne(1, LOJISTA_2)).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+
+    it('lojista de outra loja não muda o status (403)', async () => {
+      prismaMock.reserva.findUniqueOrThrow.mockResolvedValue({
+        status: StatusReserva.NOVA,
+        produto: DA_LOJA_1,
+      });
+
+      await expect(
+        service.atualizarStatus(1, StatusReserva.CONFIRMADA, LOJISTA_2),
+      ).rejects.toThrow(ForbiddenException);
+      expect(prismaMock.reserva.update).not.toHaveBeenCalled();
+    });
   });
 });

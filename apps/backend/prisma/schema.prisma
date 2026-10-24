@@ -26,6 +26,27 @@ enum StatusReserva {
   EXPIRADA
 }
 
+// Quem pode entrar na área de gestão
+enum Papel {
+  ADMIN // cadastra bairros, categorias, lojas e lojistas
+  LOJISTA // gerencia só a própria loja
+}
+
+model Usuario {
+  id           Int      @id @default(autoincrement())
+  nome         String
+  email        String   @unique
+  senhaHash    String // bcrypt: nunca guardamos a senha em texto
+  papel        Papel    @default(LOJISTA)
+  lojaId       Int? // obrigatório para LOJISTA, vazio para ADMIN
+  loja         Loja?    @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  criadoEm     DateTime @default(now())
+  atualizadoEm DateTime @updatedAt
+
+  @@index([lojaId])
+  @@map("usuarios")
+}
+
 model Bairro {
   id    Int    @id @default(autoincrement())
   nome  String @unique
@@ -53,6 +74,7 @@ model Loja {
   totalAvaliacoes Int           @default(0)
   horarios        HorarioLoja[]
   produtos        Produto[]
+  usuarios        Usuario[]
   criadoEm        DateTime      @default(now())
   atualizadoEm    DateTime      @updatedAt
 

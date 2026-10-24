@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { garantirAcessoALoja, UsuarioLogado } from '../auth/usuario-logado.js';
+import { Papel } from '../generated/prisma/enums.js';
 import { slugify } from '../common/utils/slugify.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateLojaDto } from './dto/create-loja.dto.js';
@@ -58,7 +60,17 @@ export class LojasService {
   }
 
   // Se vier "horarios", a lista nova substitui a antiga
-  update(id: number, { horarios, ...dto }: UpdateLojaDto) {
+  update(
+    id: number,
+    { horarios, ...dto }: UpdateLojaDto,
+    usuario: UsuarioLogado,
+  ) {
+    garantirAcessoALoja(usuario, id);
+    if (usuario.papel === Papel.LOJISTA) {
+      // Nota e avaliações não são o lojista que define
+      delete dto.avaliacao;
+      delete dto.totalAvaliacoes;
+    }
     return this.prisma.loja.update({
       where: { id },
       data: {

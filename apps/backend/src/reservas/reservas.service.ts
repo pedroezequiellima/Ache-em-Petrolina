@@ -1,6 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { StatusEstoque, StatusReserva } from '../generated/prisma/enums.js';
+import { garantirAcessoALoja, UsuarioLogado } from '../auth/usuario-logado.js';
+import {
+  Papel,
+  StatusEstoque,
+  StatusReserva,
+} from '../generated/prisma/enums.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateReservaDto } from './dto/create-reserva.dto.js';
 import { FiltroReservasDto } from './dto/filtro-reservas.dto.js';
@@ -63,29 +68,39 @@ export class ReservasService {
     });
   }
 
-  async findAll(filtro: FiltroReservasDto) {
+  // Lojista só enxerga as reservas da própria loja, seja qual for o filtro
+  // enviado (nome e WhatsApp do cliente são dados pessoais: LGPD)
+  async findAll(filtro: FiltroReservasDto, usuario: UsuarioLogado) {
     await this.expirarVencidas();
+    const lojaId =
+      usuario.papel === Papel.LOJISTA ? usuario.lojaId : filtro.lojaId;
     return this.prisma.reserva.findMany({
       where: {
         status: filtro.status,
         produtoId: filtro.produtoId,
-        produto: filtro.lojaId ? { lojaId: filtro.lojaId } : undefined,
+        produto: lojaId ? { lojaId } : undefined,
       },
       ...PRODUTO_COM_LOJA,
       orderBy: { criadoEm: 'desc' },
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, usuario: UsuarioLogado) {
     await this.expirarVencidas();
-    return this.prisma.reserva.findUniqueOrThrow({
+    const reserva = await this.prisma.reserva.findUniqueOrThrow({
       where: { id },
       ...PRODUTO_COM_LOJA,
     });
+    garantirAcessoALoja(usuario, reserva.produto.loja.id);
+    return reserva;
   }
 
-  async atualizarStatus(id: number, novoStatus: StatusReserva) {
-    const reserva = await this.findOne(id);
+  async atualizarStatus(
+    id: number,
+    novoStatus: StatusReserva,
+    usuario: UsuarioLogado,
+  ) {
+    const reserva = await this.findOne(id, usuario);
     if (!TRANSICOES_STATUS[reserva.status].includes(novoStatus)) {
       throw new BadRequestException(
         `Não é possível mudar a reserva de ${reserva.status} para ${novoStatus}`,

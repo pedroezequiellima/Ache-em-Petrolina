@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { garantirAcessoALoja, UsuarioLogado } from '../auth/usuario-logado.js';
 import { slugify } from '../common/utils/slugify.js';
 import type { Prisma } from '../generated/prisma/client.js';
 import { StatusEstoque } from '../generated/prisma/enums.js';
@@ -33,7 +34,8 @@ const DETALHES = {
 export class ProdutosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(dto: CreateProdutoDto) {
+  create(dto: CreateProdutoDto, usuario: UsuarioLogado) {
+    garantirAcessoALoja(usuario, dto.lojaId);
     return this.prisma.produto.create({
       data: { ...dto, slug: dto.slug ?? slugify(dto.nome) },
     });
@@ -78,18 +80,36 @@ export class ProdutosService {
     });
   }
 
-  update(id: number, dto: UpdateProdutoDto) {
+  async update(id: number, dto: UpdateProdutoDto, usuario: UsuarioLogado) {
+    await this.garantirDono(id, usuario);
+    // Não deixa o lojista "mover" o produto para a loja de outro
+    if (dto.lojaId !== undefined) garantirAcessoALoja(usuario, dto.lojaId);
     return this.prisma.produto.update({ where: { id }, data: dto });
   }
 
-  atualizarEstoque(id: number, statusEstoque: StatusEstoque) {
+  async atualizarEstoque(
+    id: number,
+    statusEstoque: StatusEstoque,
+    usuario: UsuarioLogado,
+  ) {
+    await this.garantirDono(id, usuario);
     return this.prisma.produto.update({
       where: { id },
       data: { statusEstoque },
     });
   }
 
-  remove(id: number) {
+  async remove(id: number, usuario: UsuarioLogado) {
+    await this.garantirDono(id, usuario);
     return this.prisma.produto.delete({ where: { id } });
+  }
+
+  // 404 se o produto não existe; 403 se é de outra loja
+  private async garantirDono(id: number, usuario: UsuarioLogado) {
+    const { lojaId } = await this.prisma.produto.findUniqueOrThrow({
+      where: { id },
+      select: { lojaId: true },
+    });
+    garantirAcessoALoja(usuario, lojaId);
   }
 }

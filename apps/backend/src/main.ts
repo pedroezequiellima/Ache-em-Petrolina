@@ -23,15 +23,22 @@ async function bootstrap() {
 
   app.useGlobalFilters(new PrismaExceptionFilter());
 
-  // Documentação interativa das rotas em /docs
-  const config = new DocumentBuilder()
-    .setTitle('Ache em Petrolina API')
-    .setDescription('Lojas, produtos, categorias e reservas')
-    .setVersion('0.1.0')
-    .build();
-  SwaggerModule.setup('docs', app, () =>
-    SwaggerModule.createDocument(app, config),
-  );
+  // Documentação interativa das rotas em /docs. Desligada em produção:
+  // não precisamos mostrar o mapa da API para qualquer um.
+  if (process.env.NODE_ENV !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Ache em Petrolina API')
+      .setDescription(
+        'Lojas, produtos, categorias e reservas. Rotas com cadeado exigem login: ' +
+          'faça POST /auth/login, copie o accessToken e clique em "Authorize".',
+      )
+      .setVersion('0.2.0')
+      .addBearerAuth()
+      .build();
+    SwaggerModule.setup('docs', app, () =>
+      SwaggerModule.createDocument(app, config),
+    );
+  }
 
   await app.listen(process.env.PORT ?? 3001);
 }

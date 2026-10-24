@@ -13,7 +13,9 @@ export class PrismaService
     const adapter = new PrismaPg({
       connectionString: config.getOrThrow<string>('DATABASE_URL'),
     });
-    super({ adapter });
+    // omit: o hash da senha nunca sai do banco, a não ser que a consulta
+    // peça explicitamente (só o login faz isso). Evita vazar por engano.
+    super({ adapter, omit: { usuario: { senhaHash: true } } });
   }
 
   async onModuleInit() {

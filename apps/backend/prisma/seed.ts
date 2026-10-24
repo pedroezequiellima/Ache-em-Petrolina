@@ -2,12 +2,16 @@
 // Os JSON em seed-data/ foram exportados de apps/frontend/src/data (dados FICTÍCIOS:
 // os WhatsApp usam o prefixo 9 0000, que não existe).
 //
-// Rodar: npm run db:seed   (pode rodar de novo: atualiza pelo slug, não duplica)
+// Também cria o admin (ADMIN_EMAIL/ADMIN_SENHA do .env) e um lojista de exemplo
+// por loja: <slug-da-loja>@lojista.local com a senha SEED_SENHA_LOJISTA.
+//
+// Rodar: npm run db:seed   (pode rodar de novo: atualiza pelo slug/e-mail, não duplica)
 import 'dotenv/config';
 import { readFileSync } from 'node:fs';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { gerarHashDaSenha } from '../src/auth/senha.js';
 import { PrismaClient } from '../src/generated/prisma/client.js';
-import { StatusEstoque } from '../src/generated/prisma/enums.js';
+import { Papel, StatusEstoque } from '../src/generated/prisma/enums.js';
 
 interface CategoriaFront {
   slug: string;
@@ -133,8 +137,44 @@ async function main() {
     });
   }
 
+  // Usuários: 1 admin (do .env) + 1 lojista de exemplo por loja
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminSenha = process.env.ADMIN_SENHA;
+  if (!adminEmail || !adminSenha || adminSenha.length < 8) {
+    throw new Error('Defina ADMIN_EMAIL e ADMIN_SENHA (8+ caracteres) no .env');
+  }
+  const adminHash = await gerarHashDaSenha(adminSenha);
+  await prisma.usuario.upsert({
+    where: { email: adminEmail.toLowerCase() },
+    update: { senhaHash: adminHash, papel: Papel.ADMIN, lojaId: null },
+    create: {
+      nome: 'Administrador',
+      email: adminEmail.toLowerCase(),
+      senhaHash: adminHash,
+      papel: Papel.ADMIN,
+    },
+  });
+
+  const lojistaHash = await gerarHashDaSenha(
+    process.env.SEED_SENHA_LOJISTA ?? 'lojista-dev-123',
+  );
+  for (const l of ler<LojaFront>('lojas')) {
+    const email = `${l.slug}@lojista.local`;
+    await prisma.usuario.upsert({
+      where: { email },
+      update: { senhaHash: lojistaHash, lojaId: lojas.get(l.id)! },
+      create: {
+        nome: `Lojista ${l.name}`,
+        email,
+        senhaHash: lojistaHash,
+        papel: Papel.LOJISTA,
+        lojaId: lojas.get(l.id)!,
+      },
+    });
+  }
+
   console.log(
-    `Seed ok: ${categorias.size} categorias, ${bairros.size} bairros, ${lojas.size} lojas, ${produtos.length} produtos`,
+    `Seed ok: ${categorias.size} categorias, ${bairros.size} bairros, ${lojas.size} lojas, ${produtos.length} produtos, 1 admin + ${lojas.size} lojistas`,
   );
 }
 

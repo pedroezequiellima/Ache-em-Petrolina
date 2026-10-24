@@ -1,8 +1,33 @@
 ### Requisições de exemplo da API — Ache em Petrolina
 ### Use com a extensão "REST Client" do VS Code: clique em "Send Request" acima de cada uma.
-### Antes: npm run db:up && npm run db:seed (carrega as 8 lojas e 30 produtos do front)
+### Antes: npm run db:up && npm run db:seed (carrega as 8 lojas e 30 produtos do front + usuários)
+### Rotas com 🔒 precisam de login: rode primeiro um dos "LOGIN" abaixo.
 
 @api = http://localhost:3001
+
+### ========================= LOGIN =========================
+
+### 🔑 Login como ADMIN (troque pela ADMIN_SENHA do seu .env)
+# @name loginAdmin
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "admin@ache.local", "senha": "troque-esta-senha" }
+
+### 🔑 Login como LOJISTA da loja 1 (Passo Certo Calçados)
+# @name loginLojista
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{ "email": "passo-certo-calcados@lojista.local", "senha": "lojista-dev-123" }
+
+###
+@admin = {{loginAdmin.response.body.accessToken}}
+@lojista = {{loginLojista.response.body.accessToken}}
+
+### Quem sou eu? 🔒
+GET {{api}}/auth/me
+Authorization: Bearer {{lojista}}
 
 ### Health check
 GET {{api}}/health
@@ -33,16 +58,18 @@ GET {{api}}/bairros?comLojas=true
 ### Perfil da loja pelo slug
 GET {{api}}/lojas/slug/passo-certo-calcados
 
-### ===================== CADASTROS =====================
+### ============ CADASTROS (🔒 bairros/lojas: só ADMIN) ============
 
 ### Criar bairro (slug é gerado sozinho)
 POST {{api}}/bairros
+Authorization: Bearer {{admin}}
 Content-Type: application/json
 
 { "nome": "Vila Mocó" }
 
 ### Criar loja (bairroId vem de GET /bairros)
 POST {{api}}/lojas
+Authorization: Bearer {{admin}}
 Content-Type: application/json
 
 {
@@ -58,8 +85,9 @@ Content-Type: application/json
   ]
 }
 
-### Criar produto
+### Criar produto 🔒 (lojista só na própria loja)
 POST {{api}}/produtos
+Authorization: Bearer {{lojista}}
 Content-Type: application/json
 
 {
@@ -75,8 +103,9 @@ Content-Type: application/json
   "categoriaId": 1
 }
 
-### Mudar estoque
+### Mudar estoque 🔒
 PATCH {{api}}/produtos/1/estoque
+Authorization: Bearer {{lojista}}
 Content-Type: application/json
 
 { "statusEstoque": "POUCAS_UNIDADES" }
@@ -95,11 +124,13 @@ Content-Type: application/json
   "produtoId": 1
 }
 
-### Reservas novas de uma loja
-GET {{api}}/reservas?lojaId=1&status=NOVA
+### Reservas novas 🔒 (lojista vê só as da loja dele)
+GET {{api}}/reservas?status=NOVA
+Authorization: Bearer {{lojista}}
 
-### Loja confirma a reserva
+### Loja confirma a reserva 🔒
 PATCH {{api}}/reservas/1/status
+Authorization: Bearer {{lojista}}
 Content-Type: application/json
 
 { "status": "CONFIRMADA" }
@@ -114,6 +145,7 @@ Content-Type: application/json
 
 ### 400 — foto com endereço perigoso
 POST {{api}}/produtos
+Authorization: Bearer {{lojista}}
 Content-Type: application/json
 
 { "nome": "X", "preco": 1, "lojaId": 1, "categoriaId": 1, "fotos": ["javascript:alert(1)"] }
@@ -126,3 +158,28 @@ GET {{api}}/produtos/slug/nao-existe
 
 ### 409 — categoria com produtos não pode ser apagada
 DELETE {{api}}/categorias/1
+Authorization: Bearer {{admin}}
+
+### 401 — rota protegida sem login
+GET {{api}}/reservas
+
+### 403 — lojista da loja 1 mexendo em produto de outra loja
+PATCH {{api}}/produtos/9/estoque
+Authorization: Bearer {{lojista}}
+Content-Type: application/json
+
+{ "statusEstoque": "ESGOTADO" }
+
+### 403 — lojista tentando o que é só do admin
+POST {{api}}/categorias
+Authorization: Bearer {{lojista}}
+Content-Type: application/json
+
+{ "nome": "Hack" }
+
+### Cadastrar um lojista novo 🔒 só ADMIN
+POST {{api}}/usuarios
+Authorization: Bearer {{admin}}
+Content-Type: application/json
+
+{ "nome": "Ana", "email": "ana@valetech.com", "senha": "senha-forte-123", "lojaId": 2 }
