@@ -25,7 +25,7 @@ Pré-requisitos: **Node.js 24+** e **Docker Desktop** aberto.
 cd apps/backend
 
 # 1. Instalar dependências NA RAIZ do repositório (já roda o "prisma generate")
-npm install --prefix ../..
+(cd ../.. && npm install)
 
 # 2. Criar o arquivo de variáveis de ambiente
 cp .env.example .env
