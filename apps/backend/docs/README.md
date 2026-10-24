@@ -14,6 +14,7 @@ Responsável: Daniel · Issues [#5](https://github.com/pedroezequiellima/Ache-em
 | [05 — Segurança](05-seguranca.md) | O que está protegido e o que falta | Revisão de segurança |
 | [06 — Análise do front](06-analise-front-e-proximos-passos.md) | O que o front precisa da API e o plano | Próximos passos |
 | [07 — Banco e API no formato do front](07-integracao-com-o-front.md) | Bairros, horários, slugs, seed, busca com relevância, como o front troca os mocks | **Para o pessoal do front** |
+| [08 — Login e permissões](08-login-e-permissoes.md) | JWT, bcrypt, papéis ADMIN/LOJISTA, matriz de rotas protegidas, limite de requisições | Segurança |
 
 Requisições prontas para testar: [`../requests.http`](../requests.http) (extensão REST Client do VS Code).
 Como rodar: [`../README.md`](../README.md).
@@ -32,6 +33,7 @@ Como rodar: [`../README.md`](../README.md).
 | 24/10 | `.gitattributes` (LF), lock da raiz com o backend, remoção do `@nestjs/mau`, checklist verde | `chore: força LF no Git, inclui o backend no lock...` |
 | 24/10 | **PR #12 juntado na `main`** (merge feito pelo Daniel no GitHub) | `Merge pull request #12` |
 | 24/10 | Banco no formato do front (bairros, horários, slugs), seed com os dados do front, busca com relevância, Swagger sem plugin | `feat(backend): alinha banco e API ao modelo do front` |
+| 24/10 | Login com JWT, papéis ADMIN/LOJISTA, rotas protegidas, reservas só da própria loja, limite de requisições | `feat(backend): login com JWT e rotas protegidas por papel` |
 
 ## Situação atual
 
@@ -47,10 +49,11 @@ Como rodar: [`../README.md`](../README.md).
 | Ajuste do banco ao modelo do front | ✅ Pronto (doc 07) |
 | Seed com dados do front | ✅ 8 lojas e 30 produtos |
 | Busca com relevância no back | ✅ Pronto |
-| Login e proteção das reservas | 📋 Planejado (doc 05) |
+| Login e proteção das reservas | ✅ Pronto (doc 08) |
+| Tela de login no front | 📋 Combinar com o grupo |
 
 ## Números
 
-- **6** tabelas · **5** módulos · **27** rotas nos módulos + `/health` e `/docs`
-- **23** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed (24/10)
+- **7** tabelas · **7** módulos · **33** rotas (27 de catálogo/reservas + 3 de login + 3 de usuários) + `/health` e `/docs`
+- **40** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed, incluindo cada permissão (24/10)
 - Portas: front **3000** · API **3001** · Postgres **5433**

@@ -2,6 +2,8 @@
 
 > **Data:** 24/10/2026 · direto na `main` (combinado com o grupo: o backend é feito por uma pessoa só)
 > Resolve os itens 2, 3 e 4 do [plano do doc 06](06-analise-front-e-proximos-passos.md).
+>
+> 🔒 Depois deste doc entrou o **login** ([doc 08](08-login-e-permissoes.md)): as rotas de **leitura** do catálogo continuam públicas, mas criar/editar e ver reservas agora exigem login.
 
 ## Objetivo
 

@@ -1,5 +1,7 @@
 # 03 — Entendendo os módulos (guia de estudo)
 
+> Atualizado em 24/10: depois deste guia entraram `bairros/` (doc 07) e o login com `auth/` e `usuarios/` (doc 08). A estrutura de cada módulo é a mesma explicada aqui.
+
 > Explica **cada pasta e cada arquivo** do backend e **por que** existem.
 > Todos os exemplos são do código real do projeto.
 
@@ -42,10 +44,14 @@ apps/backend/
 │   ├── app.service.ts
 │   ├── common/                 ← coisas compartilhadas
 │   │   ├── filters/
-│   │   └── utils/
+│   │   ├── utils/
+│   │   └── validators/
 │   ├── prisma/                 ← CONEXÃO com o banco
 │   ├── generated/prisma/       ← código gerado automaticamente
-│   ├── lojas/                  ┐
+│   ├── auth/                   ┐ LOGIN E PERMISSÕES (doc 08)
+│   ├── usuarios/               ┘
+│   ├── bairros/                ┐
+│   ├── lojas/                  │
 │   ├── categorias/             │ MÓDULOS DE NEGÓCIO
 │   ├── produtos/               │ (um por assunto)
 │   └── reservas/               ┘

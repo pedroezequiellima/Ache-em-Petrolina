@@ -74,6 +74,10 @@ curl http://localhost:3001/health
 | `POSTGRES_PASSWORD` | `ache123` | Senha do Postgres (Docker) |
 | `POSTGRES_DB` | `ache_petrolina` | Nome do banco (Docker) |
 | `POSTGRES_PORT` | `5433` | Porta do Postgres no seu PC (5433 pra não conflitar com um Postgres já instalado) |
+| `JWT_SECRET` | 64 caracteres aleatórios | Assina os tokens de login (32+ caracteres; nunca no Git) |
+| `JWT_EXPIRA_EM` | `1d` | Validade do token |
+| `ADMIN_EMAIL` / `ADMIN_SENHA` | `admin@ache.local` | Admin criado pelo seed |
+| `SEED_SENHA_LOJISTA` | `lojista-dev-123` | Senha dos lojistas de exemplo |
 | `FRONTEND_URL` | `http://localhost:3000` | Endereço do front liberado no CORS |
 | `RESERVA_VALIDADE_HORAS` | `24` | Horas até uma reserva expirar |
 | `DATABASE_URL` | `postgresql://ache:ache123@localhost:5433/ache_petrolina?schema=public` | Conexão usada pelo Prisma |
@@ -82,11 +86,16 @@ curl http://localhost:3001/health
 
 ## Rotas
 
+> 🔒 **Leitura do catálogo e criar reserva são públicos.** Criar/editar e ver reservas exigem login (`Authorization: Bearer <token>`). Matriz completa no [doc 08](docs/08-login-e-permissoes.md).
+
 Documentação interativa (Swagger): **http://localhost:3001/docs**. Exemplos prontos em [`requests.http`](requests.http).
 
 | Método | Rota | Descrição |
 |---|---|---|
 | GET | `/health` | Verifica se a API e o banco estão no ar |
+| POST | `/auth/login` | Login: devolve o token JWT (5 tentativas/min) |
+| GET / PATCH | `/auth/me` · `/auth/senha` | Quem sou eu · trocar senha 🔒 |
+| POST / GET / DELETE | `/usuarios` | Cadastrar lojistas e admins 🔒 só ADMIN |
 | POST / GET | `/lojas` | Cadastrar / listar lojas (`?bairro=` slug) |
 | GET | `/lojas/slug/:slug` | Perfil da loja pelo slug |
 | POST / GET | `/bairros` | Criar / listar bairros (`?comLojas=true`) |
@@ -139,3 +148,4 @@ apps/backend/
 - [05 — Segurança](docs/05-seguranca.md)
 - [06 — Análise do front e próximos passos](docs/06-analise-front-e-proximos-passos.md)
 - [07 — Banco e API no formato do front](docs/07-integracao-com-o-front.md)
+- [08 — Login e permissões](docs/08-login-e-permissoes.md)

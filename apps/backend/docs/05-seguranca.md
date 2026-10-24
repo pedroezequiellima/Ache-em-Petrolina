@@ -2,6 +2,8 @@
 
 > Revisão feita em 24/10/2026, olhando o código do backend.
 > Resumo: **a base está protegida**, mas ainda **não está pronta para produção**. Falta principalmente **autenticação** e **proteção dos dados pessoais das reservas**.
+>
+> ✅ **Atualizado em 24/10:** login com JWT, papéis (ADMIN/LOJISTA), "só a própria loja", proteção das reservas, limite de requisições e Swagger desligado em produção foram feitos. Ver [doc 08](08-login-e-permissoes.md).
 
 ---
 
@@ -28,28 +30,28 @@
 
 ### 🔴 Alta: resolver antes de ir para produção
 
-**1. Não existe login (autenticação).**
+**1. ~~Não existe login (autenticação).~~ ✅ Feito (doc 08).**
 Hoje **qualquer pessoa** que souber o endereço da API pode:
 - criar, editar e apagar lojas, produtos e categorias;
 - mudar o status de qualquer reserva (confirmar, cancelar).
 
 O que fazer: login para os lojistas (ex: JWT com `@nestjs/jwt` + `@nestjs/passport`) e um **Guard** do Nest protegendo as rotas de escrita. As rotas de leitura do catálogo continuam públicas. Cada lojista só pode mexer na **própria** loja (autorização).
 
-**2. Dados pessoais expostos em `GET /reservas`.**
+**2. ~~Dados pessoais expostos em `GET /reservas`.~~ ✅ Feito (doc 08): lojista só vê as reservas da própria loja.**
 A listagem de reservas é pública e mostra **nome e WhatsApp dos clientes**. Pela LGPD, isso é dado pessoal e só a loja da reserva deveria ver.
 
 O que fazer: proteger `GET /reservas` e `GET /reservas/:id` com o mesmo login do item 1, filtrando pela loja do usuário logado.
 
 ### 🟠 Média
 
-**3. Sem limite de requisições (rate limit).**
+**3. ~~Sem limite de requisições (rate limit).~~ ✅ Feito (doc 08): 5 logins/min, 10 reservas/min, 100 req/min no geral.**
 Um robô pode criar milhares de reservas falsas por minuto.
 O que fazer: `@nestjs/throttler` (ex: no máximo 5 reservas por minuto por IP).
 
 **4. Sem cabeçalhos de segurança HTTP.**
 O que fazer: `helmet` no `main.ts`, que adiciona `X-Content-Type-Options`, `X-Frame-Options` etc. e esconde o `X-Powered-By: Express`. (O README do front tem a mesma pendência do lado dele.)
 
-**5. Swagger aberto em produção.**
+**5. ~~Swagger aberto em produção.~~ ✅ Feito (doc 08): só liga fora de produção.**
 O `/docs` mostra todas as rotas para qualquer um. É ótimo em desenvolvimento, mas em produção deveria ser desligado ou protegido.
 O que fazer: só ativar o Swagger quando `NODE_ENV !== 'production'`.
 
@@ -85,9 +87,10 @@ Os 4 alertas que sobram são todos a mesma falha do `multer`, contada em cada pa
 | Segredos fora do Git | ✅ Feito |
 | CORS | ✅ Restrito ao front |
 | Consentimento LGPD | ✅ Obrigatório |
-| Login / permissões | ❌ A fazer (prioridade alta) |
-| Dados pessoais das reservas | ❌ Expostos, depende do login |
-| Rate limit | ❌ A fazer |
+| Login / permissões | ✅ JWT + papéis + "só a própria loja" (doc 08) |
+| Dados pessoais das reservas | ✅ Só o lojista da loja e o admin |
+| Rate limit | ✅ Login 5/min, reservas 10/min, geral 100/min |
 | Cabeçalhos (helmet) | ❌ A fazer |
-| Swagger em produção | ❌ A desligar |
+| Swagger em produção | ✅ Desligado |
+| Senhas | ✅ bcrypt; o hash nunca sai do banco |
 | HTTPS | ⏳ Infra (#8) |
