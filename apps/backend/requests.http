@@ -1,7 +1,7 @@
 ### Requisições de exemplo da API — Ache em Petrolina
 ### Use com a extensão "REST Client" do VS Code: clique em "Send Request" acima de cada uma.
 
-@api = http://localhost:3000
+@api = http://localhost:3001
 
 ### Health check
 GET {{api}}/health

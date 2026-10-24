@@ -7,8 +7,10 @@ import { PrismaExceptionFilter } from './common/filters/prisma-exception.filter.
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Libera o front (Next.js) para chamar a API de outro endereço/porta
-  app.enableCors();
+  // Libera só o front (Next.js) para chamar a API pelo navegador
+  app.enableCors({
+    origin: process.env.FRONTEND_URL ?? 'http://localhost:3000',
+  });
 
   // Valida todos os DTOs: remove campos desconhecidos e converte tipos (ex: "3" -> 3)
   app.useGlobalPipes(
@@ -31,6 +33,6 @@ async function bootstrap() {
     SwaggerModule.createDocument(app, config),
   );
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3001);
 }
 await bootstrap();

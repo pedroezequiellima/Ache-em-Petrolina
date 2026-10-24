@@ -20,7 +20,7 @@ API REST do projeto **Ache em Petrolina**, feita com **NestJS** + **Prisma ORM**
 Pré-requisitos: **Node.js 24+** e **Docker Desktop** aberto.
 
 ```bash
-cd backend
+cd apps/backend
 
 # 1. Instalar dependências (já roda o "prisma generate" sozinho)
 npm install
@@ -38,10 +38,10 @@ npx prisma migrate dev
 npm run start:dev
 ```
 
-A API sobe em **http://localhost:3000**. Para testar se está tudo ok:
+A API sobe em **http://localhost:3001**. Para testar se está tudo ok:
 
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:3001/health
 # {"status":"ok","database":"up"}
 ```
 
@@ -63,11 +63,12 @@ curl http://localhost:3000/health
 
 | Variável | Exemplo | Descrição |
 |---|---|---|
-| `PORT` | `3000` | Porta da API |
+| `PORT` | `3001` | Porta da API (o front usa a 3000) |
 | `POSTGRES_USER` | `ache` | Usuário do Postgres (Docker) |
 | `POSTGRES_PASSWORD` | `ache123` | Senha do Postgres (Docker) |
 | `POSTGRES_DB` | `ache_petrolina` | Nome do banco (Docker) |
 | `POSTGRES_PORT` | `5433` | Porta do Postgres no seu PC (5433 pra não conflitar com um Postgres já instalado) |
+| `FRONTEND_URL` | `http://localhost:3000` | Endereço do front liberado no CORS |
 | `RESERVA_VALIDADE_HORAS` | `24` | Horas até uma reserva expirar |
 | `DATABASE_URL` | `postgresql://ache:ache123@localhost:5433/ache_petrolina?schema=public` | Conexão usada pelo Prisma |
 
@@ -75,7 +76,7 @@ curl http://localhost:3000/health
 
 ## Rotas
 
-Documentação interativa (Swagger): **http://localhost:3000/docs**. Exemplos prontos em [`requests.http`](requests.http).
+Documentação interativa (Swagger): **http://localhost:3001/docs**. Exemplos prontos em [`requests.http`](requests.http).
 
 | Método | Rota | Descrição |
 |---|---|---|
@@ -94,7 +95,7 @@ Documentação interativa (Swagger): **http://localhost:3000/docs**. Exemplos pr
 ## Estrutura
 
 ```
-backend/
+apps/backend/
 ├── prisma/
 │   ├── schema.prisma        # Modelos do banco (tabelas)
 │   └── migrations/          # Histórico de mudanças no banco (SQL)
@@ -119,4 +120,4 @@ backend/
 
 ## Documentação detalhada
 
-Explicação passo a passo do que foi feito e por quê: [`docs/backend/`](../docs/backend/).
+Explicação passo a passo do que foi feito e por quê: [`docs/`](docs/).

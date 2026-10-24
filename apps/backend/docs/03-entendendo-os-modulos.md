@@ -31,7 +31,7 @@ O garçom **não cozinha**. O cozinheiro **não atende cliente**. Cada um faz um
 ## 2. O mapa das pastas
 
 ```
-backend/
+apps/backend/
 ├── prisma/                     ← BANCO DE DADOS (definição)
 │   ├── schema.prisma
 │   └── migrations/
@@ -60,11 +60,11 @@ backend/
 
 ### `src/main.ts`: a porta de entrada
 É o **primeiro arquivo que roda**. Ele liga o servidor e configura o que vale para a API inteira:
-- `enableCors()`: deixa o front (outra porta) chamar a API;
+- `enableCors()`: deixa o front (porta 3000) chamar a API, e só ele;
 - `ValidationPipe`: ativa a validação dos DTOs em **todas** as rotas;
 - `PrismaExceptionFilter`: transforma erros do banco em 404/409;
 - Swagger em `/docs`;
-- `app.listen(3000)`: começa a escutar requisições.
+- `app.listen(3001)`: começa a escutar requisições.
 
 ### `src/app.module.ts`: o módulo raiz
 É o "chefe de cozinha" que conhece todas as seções. Se um módulo não estiver listado aqui, **ele não existe para a API**:

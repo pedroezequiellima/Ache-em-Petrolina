@@ -244,13 +244,13 @@ Criamos o `PrismaExceptionFilter` (`src/common/filters/`), que transforma os err
 
 ## 7. Swagger: documentação automática
 
-Acesse **http://localhost:3000/docs** com a API rodando. Lá aparecem todas as rotas, os campos, os exemplos, e dá pra **testar direto pelo navegador** (botão "Try it out"). É ótimo para a apresentação e para o pessoal do front ver o formato dos dados.
+Acesse **http://localhost:3001/docs** com a API rodando. Lá aparecem todas as rotas, os campos, os exemplos, e dá pra **testar direto pelo navegador** (botão "Try it out"). É ótimo para a apresentação e para o pessoal do front ver o formato dos dados.
 
 Configurado com o plugin do `@nestjs/swagger` no `nest-cli.json`. Ele lê os DTOs e os comentários `/** @example ... */` automaticamente, sem precisar repetir a documentação.
 
 ## 8. CORS
 
-`app.enableCors()` no `main.ts` libera o front (Next.js, em outra porta) para chamar a API pelo navegador. Sem isso, o navegador bloqueia as requisições.
+`app.enableCors({ origin: FRONTEND_URL })` no `main.ts` libera **só o endereço do front** (Next.js, porta 3000) para chamar a API pelo navegador. Sem isso, o navegador bloqueia as requisições.
 
 ---
 
@@ -261,7 +261,7 @@ Configurado com o plugin do `@nestjs/swagger` no `nest-cli.json`. Ele lê os DTO
 - `slugify.spec.ts`: geração de slug com acentos e símbolos.
 - `app.controller.spec.ts`: rotas `/` e `/health`.
 
-**Manuais** (com a API rodando e o banco real): testamos via `curl` todas as rotas, os filtros e todos os casos de erro da tabela acima. O arquivo [`backend/requests.http`](../../backend/requests.http) tem essas requisições prontas para rodar no VS Code (extensão **REST Client**). Dá pra usar na apresentação.
+**Manuais** (com a API rodando e o banco real): testamos via `curl` todas as rotas, os filtros e todos os casos de erro da tabela acima. O arquivo [`requests.http`](../requests.http) tem essas requisições prontas para rodar no VS Code (extensão **REST Client**). Dá pra usar na apresentação.
 
 ---
 

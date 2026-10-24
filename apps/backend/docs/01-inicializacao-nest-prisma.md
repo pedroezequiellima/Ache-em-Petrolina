@@ -110,7 +110,7 @@ Criou:
 O Prisma Client é gerado em `src/generated/prisma` e **não vai pro Git** — ele é recriado automaticamente pelo script `postinstall` sempre que alguém roda `npm install`.
 
 ### 5. Banco PostgreSQL com Docker
-Criamos um `backend/docker-compose.yml` que sobe só o Postgres:
+Criamos um `apps/backend/docker-compose.yml` que sobe só o Postgres:
 
 ```bash
 npm run db:up      # docker compose up -d
@@ -149,7 +149,7 @@ npm run build   # ✅ compila sem erros
 npm test        # ✅ 2 testes passando (rota / e /health com Prisma mockado)
 npm run lint    # ✅ sem problemas
 npm run db:up && npm run start:dev
-curl http://localhost:3000/health
+curl http://localhost:3001/health
 # ✅ {"status":"ok","database":"up"}
 ```
 
