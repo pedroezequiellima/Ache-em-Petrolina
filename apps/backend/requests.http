@@ -1,0 +1,108 @@
+### Requisições de exemplo da API — Ache em Petrolina
+### Use com a extensão "REST Client" do VS Code: clique em "Send Request" acima de cada uma.
+
+@api = http://localhost:3001
+
+### Health check
+GET {{api}}/health
+
+### ===================== CATEGORIAS =====================
+
+### Criar categoria (slug é gerado sozinho)
+POST {{api}}/categorias
+Content-Type: application/json
+
+{ "nome": "Moda Feminina" }
+
+### Listar categorias
+GET {{api}}/categorias
+
+### ======================== LOJAS ========================
+
+### Criar loja
+POST {{api}}/lojas
+Content-Type: application/json
+
+{
+  "nome": "Boutique Sol do Sertão",
+  "descricao": "Moda feminina e acessórios",
+  "whatsapp": "5587999990001",
+  "endereco": "Av. Souza Filho, 123",
+  "bairro": "Centro"
+}
+
+### Listar lojas do Centro
+GET {{api}}/lojas?bairro=Centro
+
+### Perfil da loja com produtos
+GET {{api}}/lojas/1
+
+### ======================= PRODUTOS =======================
+
+### Criar produto
+POST {{api}}/produtos
+Content-Type: application/json
+
+{
+  "nome": "Vestido Midi Floral",
+  "descricao": "Tecido leve, tamanhos P ao GG",
+  "preco": 129.9,
+  "fotos": ["https://exemplo.com/vestido.jpg"],
+  "lojaId": 1,
+  "categoriaId": 1
+}
+
+### Catálogo com busca e filtros
+GET {{api}}/produtos?busca=vestido&bairro=Centro&categoria=moda-feminina
+
+### Detalhes do produto
+GET {{api}}/produtos/1
+
+### Mudar estoque
+PATCH {{api}}/produtos/1/estoque
+Content-Type: application/json
+
+{ "statusEstoque": "POUCAS_UNIDADES" }
+
+### ======================= RESERVAS =======================
+
+### Criar reserva (formulário do front)
+POST {{api}}/reservas
+Content-Type: application/json
+
+{
+  "nomeCliente": "Maria Silva",
+  "whatsappCliente": "5587988887777",
+  "quantidade": 1,
+  "aceiteLgpd": true,
+  "produtoId": 1
+}
+
+### Reservas novas de uma loja
+GET {{api}}/reservas?lojaId=1&status=NOVA
+
+### Loja confirma a reserva
+PATCH {{api}}/reservas/1/status
+Content-Type: application/json
+
+{ "status": "CONFIRMADA" }
+
+### ================== CASOS DE ERRO (demo) ==================
+
+### 400 — dados inválidos + campo extra
+POST {{api}}/reservas
+Content-Type: application/json
+
+{ "nomeCliente": "", "whatsappCliente": "abc", "quantidade": 0, "aceiteLgpd": false, "produtoId": 1, "hacker": true }
+
+### 400 — transição de status proibida (rode depois de RETIRADA)
+PATCH {{api}}/reservas/1/status
+Content-Type: application/json
+
+{ "status": "NOVA" }
+
+### 404 — não existe
+GET {{api}}/produtos/999
+
+### 409 — categoria com produtos não pode ser apagada
+DELETE {{api}}/categorias/1

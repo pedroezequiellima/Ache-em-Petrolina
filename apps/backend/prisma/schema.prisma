@@ -1,0 +1,92 @@
+// Schema do banco do Ache em Petrolina.
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Situação do estoque exibida no catálogo
+enum StatusEstoque {
+  DISPONIVEL
+  POUCAS_UNIDADES
+  ESGOTADO
+}
+
+// Ciclo de vida de uma reserva
+enum StatusReserva {
+  NOVA
+  CONFIRMADA
+  RETIRADA
+  CANCELADA
+  EXPIRADA
+}
+
+model Loja {
+  id           Int       @id @default(autoincrement())
+  nome         String
+  descricao    String?
+  whatsapp     String // Só dígitos com DDI+DDD, ex: 5587999999999 (usado no link wa.me)
+  email        String?
+  instagram    String?
+  endereco     String
+  bairro       String
+  logoUrl      String?
+  produtos     Produto[]
+  criadoEm     DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+
+  @@index([bairro])
+  @@map("lojas")
+}
+
+model Categoria {
+  id       Int       @id @default(autoincrement())
+  nome     String    @unique
+  slug     String    @unique // Versão para URL, ex: "moda-feminina"
+  produtos Produto[]
+
+  @@map("categorias")
+}
+
+model Produto {
+  id            Int           @id @default(autoincrement())
+  nome          String
+  descricao     String?
+  preco         Decimal       @db.Decimal(10, 2)
+  fotos         String[] // URLs das imagens
+  statusEstoque StatusEstoque @default(DISPONIVEL)
+  lojaId        Int
+  loja          Loja          @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  categoriaId   Int
+  categoria     Categoria     @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  reservas      Reserva[]
+  criadoEm      DateTime      @default(now())
+  atualizadoEm  DateTime      @updatedAt
+
+  @@index([lojaId])
+  @@index([categoriaId])
+  @@map("produtos")
+}
+
+model Reserva {
+  id              Int           @id @default(autoincrement())
+  nomeCliente     String
+  whatsappCliente String
+  quantidade      Int
+  aceiteLgpd      Boolean // Cliente aceitou as regras/LGPD no formulário
+  status          StatusReserva @default(NOVA)
+  expiraEm        DateTime // Prazo para retirada; depois disso vira EXPIRADA
+  produtoId       Int
+  produto         Produto       @relation(fields: [produtoId], references: [id], onDelete: Cascade)
+  criadoEm        DateTime      @default(now())
+  atualizadoEm    DateTime      @updatedAt
+
+  @@index([produtoId])
+  @@index([status])
+  @@map("reservas")
+}

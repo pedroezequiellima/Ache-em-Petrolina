@@ -1,0 +1,14 @@
+# Força quebra de linha LF em todos os sistemas (o Prettier e o CI esperam LF).
+# Sem isso, o Git no Windows (core.autocrlf=true) converte para CRLF e o
+# "npm run format:check" falha em todos os arquivos.
+* text=auto eol=lf
+
+# Arquivos binários: o Git não mexe
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
