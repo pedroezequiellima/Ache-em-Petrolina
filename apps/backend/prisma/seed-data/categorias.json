@@ -1,0 +1,38 @@
+[
+  {
+    "slug": "moda",
+    "name": "Moda"
+  },
+  {
+    "slug": "calcados",
+    "name": "Calçados"
+  },
+  {
+    "slug": "eletronicos",
+    "name": "Eletrônicos"
+  },
+  {
+    "slug": "casa",
+    "name": "Casa"
+  },
+  {
+    "slug": "construcao",
+    "name": "Construção"
+  },
+  {
+    "slug": "pet",
+    "name": "Pet"
+  },
+  {
+    "slug": "farmacia",
+    "name": "Farmácia"
+  },
+  {
+    "slug": "presentes",
+    "name": "Presentes"
+  },
+  {
+    "slug": "automotivo",
+    "name": "Automotivo"
+  }
+]

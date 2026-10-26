@@ -1,0 +1,6 @@
+.next/
+out/
+build/
+public/mock/
+package-lock.json
+next-env.d.ts
