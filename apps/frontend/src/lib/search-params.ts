@@ -12,7 +12,8 @@ export const DEFAULT_FILTERS: SearchFilters = {
 
 type RawSearchParams = Record<string, string | string[] | undefined>;
 
-function first(value: string | string[] | undefined): string {
+// Primeiro valor de um parâmetro da URL (?a=1&a=2 vira "1"), sem espaços nas pontas
+export function first(value: string | string[] | undefined): string {
   return (Array.isArray(value) ? value[0] : value)?.trim() ?? "";
 }
 

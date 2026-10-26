@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  CalendarCheck,
   ChevronRight,
   Clock,
   MapPin,
@@ -128,7 +129,12 @@ export default async function ProductPage({ params }: PageProps<"/produto/[slug]
               <div className="min-w-0">
                 <p className="text-xs font-medium text-stone-500">Disponível na loja</p>
                 <h2 id="loja" className="font-semibold">
-                  {store.name}
+                  <Link
+                    href={`/loja/${store.slug}`}
+                    className="hover:text-brand-700 hover:underline"
+                  >
+                    {store.name}
+                  </Link>
                 </h2>
                 <p className="mt-0.5 flex items-center gap-1 text-sm text-stone-600">
                   <Star className="size-4 fill-amber-400 text-amber-400" aria-hidden />
@@ -193,9 +199,17 @@ export default async function ProductPage({ params }: PageProps<"/produto/[slug]
 
       {moreFromStore.length > 0 && (
         <section aria-labelledby="mais-da-loja" className="mt-10">
-          <h2 id="mais-da-loja" className="text-xl font-bold">
-            Mais da {store.name}
-          </h2>
+          <div className="flex items-end justify-between gap-4">
+            <h2 id="mais-da-loja" className="text-xl font-bold">
+              Mais da {store.name}
+            </h2>
+            <Link
+              href={`/loja/${store.slug}`}
+              className="shrink-0 text-sm font-semibold text-brand-700 hover:underline"
+            >
+              Ver a loja
+            </Link>
+          </div>
           <div className="mt-4">
             <ProductGrid products={moreFromStore} />
           </div>
@@ -211,17 +225,30 @@ export default async function ProductPage({ params }: PageProps<"/produto/[slug]
   );
 }
 
+// Reservar (quando há estoque), WhatsApp e Ligar. Usado na coluna do desktop e na barra do celular
 function ContactActions({ product }: { product: ProductListing }) {
+  const canReserve = product.stock !== "esgotado";
+
   return (
     <>
+      {canReserve && (
+        <Link
+          href={`/produto/${product.slug}/reservar`}
+          className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-brand-700 px-5 font-semibold text-white hover:bg-brand-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700"
+        >
+          <CalendarCheck className="size-5" aria-hidden />
+          Reservar
+        </Link>
+      )}
       <a
         href={whatsappLink(product)}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-5 font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700"
+        aria-label={canReserve ? "Falar com a loja no WhatsApp" : undefined}
+        className={`flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-700 px-4 font-semibold text-white hover:bg-emerald-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700 ${canReserve ? "" : "flex-1"}`}
       >
         <MessageCircle className="size-5" aria-hidden />
-        Falar com a loja
+        <span className={canReserve ? "hidden sm:inline" : ""}>Falar com a loja</span>
       </a>
       <a
         href={phoneLink(product.store.phone)}

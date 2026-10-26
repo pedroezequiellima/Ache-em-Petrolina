@@ -35,15 +35,11 @@ export default function SearchPage({ searchParams }: PageProps<"/busca">) {
 
 async function SearchResults({ searchParams }: { searchParams: RawSearchParams }) {
   const filters = parseSearchParams(await searchParams);
-  const results = await searchProducts(filters);
+  const [results, neighborhoods] = await Promise.all([searchProducts(filters), getNeighborhoods()]);
 
   return (
     <>
-      <SearchForm
-        key={buildSearchHref(filters)}
-        neighborhoods={getNeighborhoods()}
-        defaults={filters}
-      />
+      <SearchForm key={buildSearchHref(filters)} neighborhoods={neighborhoods} defaults={filters} />
       <CategoryChips filters={filters} />
 
       <div className="mt-4 mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -73,8 +69,8 @@ async function SearchResults({ searchParams }: { searchParams: RawSearchParams }
   );
 }
 
-function CategoryChips({ filters }: { filters: SearchFilters }) {
-  const chips = [{ slug: "", name: "Todas" }, ...getCategories()];
+async function CategoryChips({ filters }: { filters: SearchFilters }) {
+  const chips = [{ slug: "", name: "Todas" }, ...(await getCategories())];
 
   return (
     <nav aria-label="Categorias" className="mt-3">
@@ -103,9 +99,11 @@ function CategoryChips({ filters }: { filters: SearchFilters }) {
   );
 }
 
-function ResultSummary({ filters, count }: { filters: SearchFilters; count: number }) {
-  const category = getCategory(filters.categoria);
-  const bairro = getNeighborhood(filters.bairro);
+async function ResultSummary({ filters, count }: { filters: SearchFilters; count: number }) {
+  const [category, bairro] = await Promise.all([
+    getCategory(filters.categoria),
+    getNeighborhood(filters.bairro),
+  ]);
 
   return (
     <>
@@ -118,8 +116,8 @@ function ResultSummary({ filters, count }: { filters: SearchFilters; count: numb
   );
 }
 
-function EmptyState({ filters }: { filters: SearchFilters }) {
-  const bairro = getNeighborhood(filters.bairro);
+async function EmptyState({ filters }: { filters: SearchFilters }) {
+  const bairro = await getNeighborhood(filters.bairro);
 
   return (
     <div className="flex flex-col items-center rounded-2xl border border-dashed border-stone-300 bg-white px-6 py-12 text-center">

@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { StockBadge } from "@/components/stock-badge";
-import { formatPrice } from "@/lib/format";
+import { formatPrice, isExternalImage } from "@/lib/format";
 import type { ProductListing } from "@/lib/types";
 
 export function ProductCard({
@@ -23,6 +23,7 @@ export function ProductCard({
         {product.images[0] && (
           <Image
             src={product.images[0]}
+            unoptimized={isExternalImage(product.images[0])}
             alt={product.name}
             fill
             sizes="(min-width: 1024px) 25vw, (min-width: 640px) 33vw, 50vw"

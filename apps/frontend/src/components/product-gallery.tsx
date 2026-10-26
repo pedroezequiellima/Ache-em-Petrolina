@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { ImageOff } from "lucide-react";
+import { isExternalImage } from "@/lib/format";
 
 export function ProductGallery({ images, alt }: { images: string[]; alt: string }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -45,6 +46,7 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
             <div key={`${src}-${i}`} className="relative aspect-square w-full shrink-0 snap-center">
               <Image
                 src={src}
+                unoptimized={isExternalImage(src)}
                 alt={`${alt} — foto ${i + 1} de ${images.length}`}
                 fill
                 sizes="(min-width: 1024px) 50vw, 100vw"
@@ -75,7 +77,14 @@ export function ProductGallery({ images, alt }: { images: string[]; alt: string 
                 active === i ? "ring-brand-600" : "opacity-70 ring-transparent hover:opacity-100"
               }`}
             >
-              <Image src={src} alt="" fill sizes="64px" className="object-cover" />
+              <Image
+                src={src}
+                unoptimized={isExternalImage(src)}
+                alt=""
+                fill
+                sizes="64px"
+                className="object-cover"
+              />
             </button>
           ))}
         </div>

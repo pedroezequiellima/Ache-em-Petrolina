@@ -26,9 +26,11 @@ const PASSOS = [
 ];
 
 export default async function HomePage() {
-  const featured = await getFeaturedProducts(8);
-  const categories = getCategories();
-  const bairros = getNeighborhoodsWithStores();
+  const [featured, categories, bairros] = await Promise.all([
+    getFeaturedProducts(8),
+    getCategories(),
+    getNeighborhoodsWithStores(),
+  ]);
 
   return (
     <main>

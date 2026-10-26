@@ -60,3 +60,70 @@ export interface SearchFilters {
   estoque: boolean;
   ordem: SortOrder;
 }
+
+// ---- Área logada (painel) ----
+
+export type Role = "ADMIN" | "LOJISTA";
+
+export type ReservationStatus = "NOVA" | "CONFIRMADA" | "RETIRADA" | "CANCELADA" | "EXPIRADA";
+
+// Categoria, bairro ou loja numa lista de escolha: o painel precisa do id para a API
+export interface Option {
+  id: number;
+  slug: string;
+  name: string;
+}
+
+export interface Reservation {
+  id: number;
+  customerName: string;
+  customerWhatsapp: string;
+  quantity: number;
+  status: ReservationStatus;
+  createdAt: string;
+  expiresAt: string;
+  product: {
+    id: number;
+    name: string;
+    price: number;
+    store: { id: number; name: string; whatsapp: string };
+  };
+}
+
+// Tudo o que o formulário da loja edita
+export interface StoreDetails extends Store {
+  neighborhood: Option;
+  description: string;
+  email: string;
+  instagram: string;
+  logoUrl: string;
+}
+
+// Página pública da loja: dados + produtos
+export interface StoreProfile extends StoreDetails {
+  products: ProductListing[];
+}
+
+// Produto como o painel edita: a API pede o id da categoria (id e storeId já vêm no ProductListing)
+export interface ManagedProduct extends ProductListing {
+  categoryId: number;
+}
+
+export interface UserSummary {
+  id: number;
+  name: string;
+  email: string;
+  role: Role;
+  store: { id: number; name: string; slug: string } | null;
+}
+
+// Linha das listas de lojas, categorias e bairros do painel
+export interface StoreSummary extends Option {
+  neighborhood: string;
+  productCount: number;
+}
+
+export interface TaxonomyItem extends Option {
+  // Produtos (categoria) ou lojas (bairro) ligados: com algum, a API não deixa apagar
+  usage: number;
+}
