@@ -89,7 +89,7 @@ Os 4 alertas que sobram são todos a mesma falha do `multer`, contada em cada pa
 | Consentimento LGPD | ✅ Obrigatório |
 | Login / permissões | ✅ JWT + papéis + "só a própria loja" (doc 08) |
 | Dados pessoais das reservas | ✅ Só o lojista da loja e o admin |
-| Rate limit | ✅ Login 5/min, reservas 10/min, geral 100/min |
+| Rate limit | ✅ Login 5/min, reservas 10/min, geral 100/min (leituras do servidor do Next liberadas pelo `FRONTEND_TOKEN`) |
 | Cabeçalhos (helmet) | ✅ Feito |
 | Esqueci minha senha | ✅ Feito (e-mail ainda só no log) |
 | Swagger em produção | ✅ Desligado |

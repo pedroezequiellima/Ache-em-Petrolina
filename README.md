@@ -10,15 +10,17 @@ pelo WhatsApp.
 Projeto da **Academia Softex DevOps**. Equipe: Pedro Ezequiel, Lívia Christina, Jamilly, João,
 Elder, Luan e Daniel.
 
-## Situação atual (23/10/2026)
+## Situação atual (26/10/2026)
 
-- **Feito:** issues **#4** (projeto Next.js com TypeScript, Tailwind, ESLint e Prettier) e **#9**
-  (tela inicial, busca com filtros e página de produto), em `apps/frontend`.
-- **Onde está o código:** na branch `main` do repositório
-  [pedroezequiellima/Ache-em-Petrolina](https://github.com/pedroezequiellima/Ache-em-Petrolina).
-- **Próximos passos:** #10 (reserva), #5 e #11 (API em `apps/backend`), `docker-compose.yml` e
-  Dockerfiles, e o CI em `.github/workflows`. As pendências do front-end estão em
-  [apps/frontend/README.md](apps/frontend/README.md#pendências).
+- **Back-end** (`apps/backend`, NestJS + Prisma + PostgreSQL): API completa do MVP, com login (JWT),
+  permissões de admin e lojista, busca com relevância, reservas e recuperação de senha. Detalhes em
+  [apps/backend/README.md](apps/backend/README.md) e [apps/backend/docs](apps/backend/docs/README.md).
+- **Front-end** (`apps/frontend`, Next.js 16): conectado a **todas** as rotas da API. Site
+  público (busca, produto, **reserva**, página da loja, `/status`) e **painel** em `/painel`
+  (reservas, produtos e estoque, dados da loja, e para o admin: lojas, usuários, categorias e
+  bairros). Detalhes em [apps/frontend/README.md](apps/frontend/README.md).
+- **Próximos passos:** `docker-compose.yml` e Dockerfiles na raiz, o CI em `.github/workflows`,
+  um provedor de e-mail de verdade (hoje a API só escreve o e-mail no log) e upload de fotos.
 
 ## Estrutura do repositório
 
@@ -26,7 +28,7 @@ Elder, Luan e Daniel.
 .github/workflows/   GitHub Actions (CI/CD); vazio por enquanto
 apps/
   frontend/          interface web em Next.js 16 + TypeScript + Tailwind CSS 4 (#4, #9)
-  backend/           API REST em NestJS + Prisma + PostgreSQL; a criar (#5, #11)
+  backend/           API REST em NestJS + Prisma + PostgreSQL (#5, #11)
 packages/            pacotes compartilhados entre os apps (ex.: shared); vazio por enquanto
 .dockerignore        arquivos que o Docker ignora ao montar as imagens
 .gitignore           arquivos que não vão para o Git
@@ -34,36 +36,42 @@ package.json         workspaces do npm e scripts globais
 README.md            este arquivo
 ```
 
-Cada app terá seu próprio código, `package.json` e `Dockerfile`. O `docker-compose.yml` ficará na
-raiz, para subir o projeto todo com um comando; ele e os Dockerfiles ainda serão criados, junto com
-o back-end e o PostgreSQL. O andamento das tarefas fica no GitHub Projects **Ache-em-Petrolina**.
+Cada app tem seu próprio código e `package.json`. O `docker-compose.yml` da raiz (para subir front,
+API e banco com um comando) e os Dockerfiles ainda serão criados; por enquanto o Postgres sobe com o
+`docker-compose.yml` de `apps/backend` (`npm run db:up`). O andamento das tarefas fica no GitHub Projects **Ache-em-Petrolina**.
 
 ## Requisitos
 
 - **Node.js 20.9 ou mais novo** (usamos o 24; veja `.nvmrc`)
 - npm (vem com o Node)
 - Git
+- **Docker Desktop** aberto, para o banco PostgreSQL (`npm run db:up`)
 
-## Como rodar o front-end
+## Como rodar
 
 Os comandos `npm` rodam na **raiz** do repositório: ela usa npm workspaces e instala as
-dependências de todos os apps de uma vez.
+dependências de todos os apps de uma vez. Precisa do **Docker** para o banco.
 
 ```bash
 git clone https://github.com/pedroezequiellima/Ache-em-Petrolina.git
 cd Ache-em-Petrolina
 npm install
+cp apps/backend/.env.example apps/backend/.env
 cp apps/frontend/.env.example apps/frontend/.env.local
-npm run dev
+npm run db:up                                   # PostgreSQL no Docker
+(cd apps/backend && npx prisma migrate deploy)
+npm run db:seed                                 # lojas, produtos e contas de exemplo
+npm run dev:backend                             # API em http://localhost:3001 (docs em /docs)
+npm run dev                                     # site em http://localhost:3000 (outro terminal)
 ```
 
-No **Prompt de Comando (cmd)** do Windows, troque o `cp` por
-`copy apps\frontend\.env.example apps\frontend\.env.local`. No PowerShell e no Git Bash o `cp`
-funciona.
+Antes de subir, troque no `apps/backend/.env` o `JWT_SECRET` e gere um `FRONTEND_TOKEN` (o mesmo
+valor vai no `apps/frontend/.env.local`); os dois arquivos explicam como. No **Prompt de Comando
+(cmd)** do Windows, troque o `cp` por `copy`.
 
-Acesse http://localhost:3000. Scripts disponíveis na raiz: `npm run dev`, `build`, `start`,
-`lint`, `format` e `format:check`. Mais detalhes, decisões e pendências em
-[apps/frontend/README.md](apps/frontend/README.md).
+Contas de exemplo do seed: o admin (`ADMIN_EMAIL`/`ADMIN_SENHA` do `.env` da API) e um lojista
+por loja (`<slug-da-loja>@lojista.local`, senha `SEED_SENHA_LOJISTA`). Entre em
+http://localhost:3000/entrar.
 
 ## Fluxo de trabalho
 
@@ -78,18 +86,23 @@ Acesse http://localhost:3000. Scripts disponíveis na raiz: `npm run dev`, `buil
 
 ## Segurança
 
-Revisão feita em 23/10/2026. O front-end ainda não tem back-end, login nem dados pessoais, então o
-risco hoje é baixo: a busca escapa código injetado, não há segredos no repositório e as
-dependências de produção não têm vulnerabilidades conhecidas (`npm audit --omit=dev`).
+Revisão atualizada em 26/10/2026. O site agora tem login e guarda dados pessoais (nome e WhatsApp
+de quem reserva). O que protege cada parte está documentado em
+[apps/backend/docs/08-login-e-permissoes.md](apps/backend/docs/08-login-e-permissoes.md) (API) e
+na seção "Login" de [apps/frontend/README.md](apps/frontend/README.md) (site e painel). Em resumo:
+token de login num cookie que o JavaScript não lê, toda permissão conferida pela API, limites de
+tentativas por visitante e cabeçalhos de segurança no site.
 
 Pendências de configuração:
 
-- **Cabeçalhos HTTP de segurança** no front-end: veja
-  [apps/frontend/README.md](apps/frontend/README.md#pendências).
+- **Produção:** HTTPS e HSTS no Nginx, que também precisa sobrescrever o `X-Forwarded-For` (veja
+  "Riscos que continuam" no README do front). Troque o `JWT_SECRET`, o `FRONTEND_TOKEN` e a senha
+  do admin do seed.
 - **Proteção da `main`** no GitHub (**Settings → Branches**): exigir Pull Request com 1 revisão.
 - **Dependabot alerts** e **Secret scanning** (**Settings → Code security**), gratuitos em
   repositórios públicos.
 - **E-mail nos commits:** o repositório é público e os commits mostram o e-mail de quem os fez.
   Para esconder nos próximos, ative **Settings → Emails → "Keep my email addresses private"** no
   GitHub e configure no Git o e-mail `...@users.noreply.github.com` mostrado nessa página.
-- **Nunca** coloque senhas, tokens ou chaves no código. Use `.env.local`, que não vai para o Git.
+- **Nunca** coloque senhas, tokens ou chaves no código. Use os arquivos `.env`/`.env.local`, que
+  não vão para o Git.

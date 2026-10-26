@@ -101,6 +101,8 @@ O `JwtAuthGuard` é **global**: toda rota exige login, a não ser que tenha `@Pu
 | **5 tentativas de login por minuto** por IP | `@Throttle` no login | Atrapalha força bruta (tentar milhares de senhas) |
 | **10 reservas por minuto** por IP | `@Throttle` em `POST /reservas` | Atrapalha robôs criando reservas falsas |
 | **100 requisições por minuto** por IP no geral | `ThrottlerModule` | Limite básico contra abuso |
+| Leituras (`GET`) do **servidor do Next** fora do limite, com o `FRONTEND_TOKEN` no cabeçalho `x-frontend-token` | `common/throttle/servidor-do-front.ts` | O site busca o catálogo no servidor dele: todas as visitas chegam com o mesmo IP e, sem isso, 100 req/min valeriam para o site inteiro. Login, reservas e cadastros continuam limitados mesmo com o token |
+| Login feito pelo site conta pelo **IP do visitante** (cabeçalho `x-cliente-ip`), aceito **só** junto com o `FRONTEND_TOKEN` | `common/throttle/servidor-do-front.ts` | Sem isso, os 5 logins por minuto valeriam para todos os usuários do site juntos. Sem o token o cabeçalho é ignorado, senão um atacante inventaria um IP por tentativa |
 | `senhaHash` **nunca sai do banco** | `omit` no `PrismaService` | Mesmo que alguém esqueça, a senha não vaza numa resposta |
 | `JWT_SECRET` com **32+ caracteres**, senão a API **nem sobe** | `auth.module.ts` | Segredo curto pode ser descoberto |
 | Em produção, recusa o segredo de exemplo do `.env.example` | `auth.module.ts` | Evita subir com um segredo que está no GitHub |
@@ -214,11 +216,11 @@ Gerar um segredo: `node -e "console.log(require('crypto').randomBytes(48).toStri
 
 | Item | Prioridade |
 |---|---|
-| Tela de login e área do lojista no **front** | Alta (combinar com o grupo) |
+| ~~Tela de login e área do lojista no **front**~~ | ✅ Feito (`/entrar` e `/painel`, ver README do front) |
 | ~~Cabeçalhos de segurança (`helmet`)~~ | ✅ Feito |
 | ~~"Esqueci minha senha"~~ | ✅ Feito (falta só ligar um provedor de e-mail de verdade) |
 | Provedor de e-mail real (SMTP, Resend, SES) no `EmailService` | Média |
-| Página `/redefinir-senha` no **front** (o link do e-mail aponta pra ela) | Média |
+| ~~Página `/redefinir-senha` no **front**~~ | ✅ Feito (`/esqueci-senha` e `/redefinir-senha`, ver README do front) |
 | Revogar token antes de expirar (ex: lista de tokens bloqueados ou token curto + refresh token) | Baixa no MVP |
 | Bloquear a conta depois de muitas tentativas erradas (hoje o limite é por IP) | Baixa |
 | HTTPS na frente da API (Nginx, issue #8) | Alta em produção |

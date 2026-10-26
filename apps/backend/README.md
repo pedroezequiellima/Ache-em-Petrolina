@@ -79,6 +79,7 @@ curl http://localhost:3001/health
 | `ADMIN_EMAIL` / `ADMIN_SENHA` | `admin@ache.local` | Admin criado pelo seed |
 | `SEED_SENHA_LOJISTA` | `lojista-dev-123` | Senha dos lojistas de exemplo |
 | `FRONTEND_URL` | `http://localhost:3000` | Endereço do front liberado no CORS |
+| `FRONTEND_TOKEN` | 64 caracteres aleatórios (opcional) | Token que o servidor do Next manda no cabeçalho `x-frontend-token`: os GETs dele não entram no limite de 100 req/min por IP, e o login feito pelo site conta pelo IP do visitante (`x-cliente-ip`). Mesmo valor no `.env.local` do front (32+ caracteres; nunca no Git) |
 | `RESERVA_VALIDADE_HORAS` | `24` | Horas até uma reserva expirar |
 | `DATABASE_URL` | `postgresql://ache:ache123@localhost:5433/ache_petrolina?schema=public` | Conexão usada pelo Prisma |
 
@@ -118,21 +119,29 @@ Documentação interativa (Swagger): **http://localhost:3001/docs**. Exemplos pr
 apps/backend/
 ├── prisma/
 │   ├── schema.prisma        # Modelos do banco (tabelas)
-│   └── migrations/          # Histórico de mudanças no banco (SQL)
+│   ├── migrations/          # Histórico de mudanças no banco (SQL)
+│   ├── seed.ts              # Dados de exemplo: lojas, produtos, admin e lojistas
+│   └── seed-data/           # JSON com os dados fictícios usados pelo seed
 ├── prisma.config.ts         # Configuração do Prisma CLI
 ├── docker-compose.yml       # Postgres para desenvolvimento
 ├── requests.http            # Requisições de exemplo (REST Client)
 ├── src/
-│   ├── main.ts              # Sobe o servidor: validação, CORS, Swagger
-│   ├── app.module.ts        # Módulo raiz: junta todos os outros
+│   ├── main.ts              # Sobe o servidor: validação, CORS, helmet, Swagger
+│   ├── app.module.ts        # Módulo raiz: junta os outros, guards globais e limite de requisições
 │   ├── app.controller.ts    # Rotas / e /health
+│   ├── auth/                # Login (JWT), /auth/me, trocar e redefinir senha; guards e decorators
+│   ├── usuarios/            # Contas de admin e lojistas (só o admin)
+│   ├── email/               # EmailService (por enquanto escreve o e-mail no log)
 │   ├── common/
 │   │   ├── filters/         # Converte erros do Prisma em 404/409
-│   │   └── utils/           # slugify
+│   │   ├── throttle/        # Exceções do limite para o servidor do Next (FRONTEND_TOKEN, IP do visitante)
+│   │   ├── utils/           # slugify
+│   │   └── validators/      # URL ou caminho (/mock/...) nas fotos e no logo
 │   ├── prisma/              # PrismaModule + PrismaService (conexão)
 │   ├── lojas/               # module, controller, service, dto/
+│   ├── bairros/
 │   ├── categorias/
-│   ├── produtos/
+│   ├── produtos/            # inclui busca.ts (busca com relevância)
 │   ├── reservas/
 │   └── generated/prisma/    # Prisma Client gerado (não vai pro Git)
 └── test/                    # Testes end-to-end

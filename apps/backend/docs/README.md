@@ -35,6 +35,9 @@ Como rodar: [`../README.md`](../README.md).
 | 24/10 | Banco no formato do front (bairros, horários, slugs), seed com os dados do front, busca com relevância, Swagger sem plugin | `feat(backend): alinha banco e API ao modelo do front` |
 | 24/10 | Login com JWT, papéis ADMIN/LOJISTA, rotas protegidas, reservas só da própria loja, limite de requisições | `feat(backend): login com JWT e rotas protegidas por papel` |
 | 24/10 | "Esqueci minha senha" (link de uso único, 30 min) e cabeçalhos de segurança (helmet) | `feat(backend): esqueci minha senha e cabeçalhos de segurança` |
+| 26/10 | Front troca os dados de exemplo pela API (catálogo, busca, produto) | (ainda sem commit) |
+| 26/10 | `FRONTEND_TOKEN`: as leituras do servidor do Next ficam fora do limite de 100 req/min; o login feito pelo site conta pelo IP do visitante (`x-cliente-ip`). Ver doc 08 | (ainda sem commit) |
+| 26/10 | Front: telas de login, esqueci/redefinir senha, reserva, página da loja, `/status` e painel completo (lojista e admin) usando todas as rotas da API | (ainda sem commit) |
 
 ## Situação atual
 
@@ -52,10 +55,11 @@ Como rodar: [`../README.md`](../README.md).
 | Busca com relevância no back | ✅ Pronto |
 | Login e proteção das reservas | ✅ Pronto (doc 08) |
 | Esqueci minha senha + helmet | ✅ Pronto (doc 08) |
-| Tela de login no front | 📋 Combinar com o grupo |
+| Tela de login no front | ✅ `/entrar` e `/painel` (README do front); login conta pelo IP do visitante (doc 08) |
+| Front ligado em todas as rotas | ✅ Reserva, página da loja, `/status` e painel completo (README do front) |
 
 ## Números
 
 - **8** tabelas · **8** módulos · **35** rotas (27 de catálogo/reservas + 5 de login + 3 de usuários) + `/health` e `/docs`
-- **44** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed, incluindo cada permissão (24/10)
+- **51** testes unitários + 1 e2e · build e lint passando; API testada rodando com o seed, incluindo cada permissão (24/10) e pelas telas do front (26/10)
 - Portas: front **3000** · API **3001** · Postgres **5433**

@@ -4,6 +4,8 @@
 > Resolve os itens 2, 3 e 4 do [plano do doc 06](06-analise-front-e-proximos-passos.md).
 >
 > 🔒 Depois deste doc entrou o **login** ([doc 08](08-login-e-permissoes.md)): as rotas de **leitura** do catálogo continuam públicas, mas criar/editar e ver reservas agora exigem login.
+>
+> ✅ **Atualizado em 26/10:** a troca descrita na seção 5 foi feita. O front usa a API em tudo (e não só no catálogo); o mapa atual de cada rota para o arquivo do front está no [README do front](../../frontend/README.md#ligação-com-a-api).
 
 ## Objetivo
 
@@ -98,6 +100,8 @@ Testes: `src/produtos/busca.spec.ts` (8 testes, incluindo o exemplo `tenis nike 
 
 ## 5. Como o front troca os mocks pela API
 
+> ✅ **Feito em 26/10.** As funções abaixo estão em `apps/frontend/src/lib/catalog.ts`, e as conversões de nomes em `apps/frontend/src/lib/mappers.ts`.
+
 Correspondência entre `src/lib/catalog.ts` e a API:
 
 | Função do front | Chamada |
@@ -122,7 +126,7 @@ Correspondência entre `src/lib/catalog.ts` e a API:
 | `loja.bairro` (`{ nome, slug }`) | `store.neighborhood` (`{ name, slug }`) | renomear |
 | `loja.telefone`, `loja.avaliacao`, `loja.totalAvaliacoes` | `phone`, `rating`, `reviewCount` | renomear |
 
-> O README do front lembra: com **Cache Components** do Next 16, cada `fetch` precisa de `"use cache"` + `cacheLife(...)` ou ficar dentro de `<Suspense>`. A URL da API deve ir no `.env.example` do front (ex: `API_URL=http://localhost:3001`).
+> O README do front lembra: com **Cache Components** do Next 16, cada `fetch` precisa de `"use cache"` + `cacheLife(...)` ou ficar dentro de `<Suspense>`. A URL da API vai no `.env.example` do front (`API_URL=http://localhost:3001`), junto com o `FRONTEND_TOKEN`.
 
 ---
 
