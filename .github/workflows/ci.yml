@@ -1,0 +1,61 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build, Lint and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+
+      - name: Instalar dependências raiz 
+        run: npm install
+
+      # =========================
+      # BACKEND (NestJS/Prisma)
+      # =========================
+      - name: Instalar dependências - Backend
+        run: npm install
+        working-directory: ./apps/backend
+
+      - name: Lint - Backend
+        run: npm run lint --if-present
+        working-directory: ./apps/backend
+
+      - name: Testes - Backend
+        run: npm run test --if-present
+        working-directory: ./apps/backend
+
+      - name: Build - Backend
+        run: npm run build
+        working-directory: ./apps/backend
+
+      # =========================
+      # FRONTEND (Next.js)
+      # =========================
+      - name: Instalar dependências - Frontend
+        run: npm install
+        working-directory: ./apps/frontend
+
+      - name: Lint - Frontend
+        run: npm run lint --if-present
+        working-directory: ./apps/frontend
+
+      - name: Testes - Frontend
+        run: npm run test --if-present
+        working-directory: ./apps/frontend
+
+      - name: Build - Frontend
+        run: npm run build
+        working-directory: ./apps/frontend
