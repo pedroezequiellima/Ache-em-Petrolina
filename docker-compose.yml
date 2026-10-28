@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: ache-postgres-dev
+    restart: unless-stopped
+    # Puxa as variáveis seguras da pasta do backend
+    # pedroezequiellima: "security: mover credenciais expostas para arquivo de ambiente"
+    env_file:
+      - ./apps/backend/.env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ache}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ache123}
+      POSTGRES_DB: ${POSTGRES_DB:-ache_petrolina}
+    ports:
+      - '${POSTGRES_PORT:-5433}:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ache_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: ache-backend
+    restart: unless-stopped
+    env_file:
+      - ./apps/backend/.env
+    ports:
+      - "${PORT:-3001}:3001"
+    depends_on:
+      - postgres
+    networks:
+      - ache_network
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: ache-frontend
+    restart: unless-stopped
+    env_file:
+      - ./apps/frontend/.env
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - ache_network
+
+volumes:
+  postgres_data:
+
+networks:
+  ache_network:
+    driver: bridge
