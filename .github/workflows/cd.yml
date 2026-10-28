@@ -30,12 +30,3 @@ jobs:
           file: ./apps/backend/dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-backend:latest
-
-      # Build e Push do Frontend (Baseado na Etapa 2)
-      - name: Build and Push - Frontend
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./apps/frontend/dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-frontend:latest
