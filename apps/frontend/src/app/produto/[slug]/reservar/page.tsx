@@ -10,6 +10,10 @@ import { formatPrice, isExternalImage, whatsappLink } from "@/lib/format";
 
 export async function generateStaticParams() {
   const slugs = await getProductSlugs();
+  if (slugs.length === 0) {
+    // Cache Components exige pelo menos 1 resultado durante o build sem API
+    return [{ slug: "__build-fallback__" }];
+  }
   return slugs.map((slug) => ({ slug }));
 }
 

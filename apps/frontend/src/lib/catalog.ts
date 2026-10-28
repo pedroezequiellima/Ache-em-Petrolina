@@ -68,8 +68,13 @@ export async function getProductSlugs(): Promise<string[]> {
   "use cache";
   cacheLife("minutes");
   cacheTag(CATALOG_TAG);
-  const products = await getProducts({});
-  return products.map((p) => p.slug);
+  try {
+    const products = await getProducts({});
+    return products.map((p) => p.slug);
+  } catch(err) {
+    console.warn("[catalog] getProductsSlugs: API indisponível durante o build. Retornando []");
+    return [];
+  }
 }
 
 export async function getStoreProducts(
@@ -101,8 +106,13 @@ export async function getStoreSlugs(): Promise<string[]> {
   "use cache";
   cacheLife("hours");
   cacheTag(CATALOG_TAG);
-  const lojas = await apiGet<{ slug: string }[]>("/lojas");
-  return lojas.map((l) => l.slug);
+  try {
+    const lojas = await apiGet<{ slug: string }[]>("/lojas");
+    return lojas.map((l) => l.slug);
+  } catch(err) {
+    console.warn("[catalog] getProductsSlugs: API indisponível durante o build. Retornando []");
+    return [];
+  }
 }
 
 export async function getCategories(): Promise<Category[]> {
