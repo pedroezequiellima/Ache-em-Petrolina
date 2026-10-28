@@ -2,7 +2,7 @@ name: CD Pipeline - Docker Build & Push
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: [ "main" ]
 
 jobs:
   docker-build-push:
@@ -22,7 +22,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build e Push do Backend
+      # Build e Push do Backend (Baseado na Etapa 2)
       - name: Build and Push - Backend
         uses: docker/build-push-action@v5
         with:
@@ -31,7 +31,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-backend:latest
 
-      # Build e Push do Frontend
+      # Build e Push do Frontend (Baseado na Etapa 2)
       - name: Build and Push - Frontend
         uses: docker/build-push-action@v5
         with:

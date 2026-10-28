@@ -19,43 +19,47 @@ jobs:
           node-version: '24'
           cache: 'npm'
 
-      - name: Instalar dependências raiz 
+      - name: Instalar dependências raiz
         run: npm install
 
       # =========================
       # BACKEND (NestJS/Prisma)
       # =========================
-      - name: Instalar dependências - Backend
+      - name: Backend - Instalar dependências
         run: npm install
         working-directory: ./apps/backend
 
-      - name: Lint - Backend
+      - name: Backend - Gerar cliente Prisma
+        run: npx prisma generate
+        working-directory: ./apps/backend
+
+      - name: Backend - Lint
         run: npm run lint --if-present
         working-directory: ./apps/backend
 
-      - name: Testes - Backend
+      - name: Backend - Testes
         run: npm run test --if-present
         working-directory: ./apps/backend
 
-      - name: Build - Backend
+      - name: Backend - Build
         run: npm run build
         working-directory: ./apps/backend
 
       # =========================
       # FRONTEND (Next.js)
       # =========================
-      - name: Instalar dependências - Frontend
+      - name: Frontend - Instalar dependências
         run: npm install
         working-directory: ./apps/frontend
 
-      - name: Lint - Frontend
+      - name: Frontend - Lint
         run: npm run lint --if-present
         working-directory: ./apps/frontend
 
-      - name: Testes - Frontend
+      - name: Frontend - Testes
         run: npm run test --if-present
         working-directory: ./apps/frontend
 
-      - name: Build - Frontend
+      - name: Frontend - Build
         run: npm run build
         working-directory: ./apps/frontend
