@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/Dockerfile
+          file: ./apps/backend/dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-backend:latest
 
@@ -36,6 +36,6 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/frontend/Dockerfile
+          file: ./apps/frontend/dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-frontend:latest
