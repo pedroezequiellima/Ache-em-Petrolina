@@ -23,5 +23,12 @@
     "db:up": "npm run db:up -w backend",
     "db:down": "npm run db:down -w backend",
     "db:seed": "npm run db:seed -w backend"
+  },
+  "allowScripts": {
+    "@prisma/engines@7.10.1": true,
+    "@scarf/scarf@1.4.0": true,
+    "esbuild@0.28.2": true,
+    "prisma@7.10.1": true,
+    "unrs-resolver@1.12.2": true
   }
 }

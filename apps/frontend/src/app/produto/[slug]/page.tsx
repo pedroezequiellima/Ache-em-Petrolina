@@ -31,6 +31,11 @@ import type { ProductListing } from "@/lib/types";
 
 export async function generateStaticParams() {
   const slugs = await getProductSlugs();
+
+  if(slugs.length === 0) {
+    return [{ slug: "__build-fallback__"}]
+  }
+
   return slugs.map((slug) => ({ slug }));
 }
 

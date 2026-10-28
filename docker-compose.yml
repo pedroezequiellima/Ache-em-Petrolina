@@ -22,7 +22,7 @@ services:
   backend:
     build:
       context: .
-      dockerfile: apps/backend/Dockerfile
+      dockerfile: apps/backend/dockerfile
     container_name: ache-backend
     restart: unless-stopped
     env_file:
@@ -38,7 +38,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: apps/frontend/Dockerfile
+      dockerfile: apps/frontend/dockerfile
     container_name: ache-frontend
     restart: unless-stopped
     env_file:
