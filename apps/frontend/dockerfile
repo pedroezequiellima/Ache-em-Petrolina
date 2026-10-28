@@ -1,0 +1,27 @@
+# 1. Fase de Build
+FROM node:24-alpine AS builder
+WORKDIR /app
+COPY package.json package-lock.json ./
+COPY . .
+RUN npm ci
+
+WORKDIR /app/apps/frontend
+RUN npm run build
+
+# 2. Fase de Produção
+FROM node:24-alpine AS production
+WORKDIR /app
+ENV NODE_ENV=production
+
+COPY --from=builder /app/apps/frontend/public ./apps/frontend/public
+# O Next.js standalone gera um servidor otimizado que não precisa do node_modules completo
+COPY --from=builder /app/apps/frontend/.next/standalone ./
+COPY --from=builder /app/apps/frontend/.next/static ./apps/frontend/.next/static
+
+RUN chown -R node:node /app
+USER node
+
+EXPOSE 3000
+
+# Executa o servidor standalone do Next.js
+CMD ["node", "apps/frontend/server.js"]
