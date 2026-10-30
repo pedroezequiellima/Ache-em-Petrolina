@@ -30,3 +30,4 @@ jobs:
           file: ./apps/backend/dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-backend:latest
+
