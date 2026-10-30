@@ -28,7 +28,7 @@ services:
     env_file:
       - ./apps/backend/.env
     ports:
-      - "${PORT:-3001}:3001"
+      - "${PORT}:"
     depends_on:
       - postgres
     networks:
