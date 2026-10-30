@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { ArrowRight, MapPin, PackageCheck, Search, Store } from "lucide-react";
 import { CategoryIcon, categoryStyle } from "@/components/category-icon";
 import { ProductGrid } from "@/components/product-card";

@@ -15,6 +15,11 @@ import {
 
 export async function generateStaticParams() {
   const slugs = await getStoreSlugs();
+
+  if(slugs.length ===0) {
+    return [{ slug: "__build-fallback__ "}];
+  }
+
   return slugs.map((slug) => ({ slug }));
 }
 
