@@ -9,6 +9,7 @@ pelo WhatsApp.
 
 Projeto da **Academia Softex DevOps**. Equipe: Pedro Ezequiel, Lívia Christina, Jamilly, João,
 Elder, Luan e Daniel.
+
 Lider: Pedro Ezequiel
 
 ## Situação atual (26/10/2026)
