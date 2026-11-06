@@ -3,6 +3,7 @@ import { CategoryIcon, categoryStyle } from "@/components/category-icon";
 import { ProductGrid } from "@/components/product-card";
 import { getCategories, getFeaturedProducts, getNeighborhoodsWithStores } from "@/lib/catalog";
 import { buildSearchHref } from "@/lib/search-params";
+import Link from 'next/link';
 
 const SUGESTOES = ["tênis", "ventilador", "ração", "celular", "protetor solar"];
 

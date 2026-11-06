@@ -71,7 +71,7 @@ export async function getProductSlugs(): Promise<string[]> {
   try {
     const products = await getProducts({});
     return products.map((p) => p.slug);
-  } catch(err) {
+  } catch(_err) {
     console.warn("[catalog] getProductsSlugs: API indisponível durante o build. Retornando []");
     return [];
   }
@@ -109,7 +109,7 @@ export async function getStoreSlugs(): Promise<string[]> {
   try {
     const lojas = await apiGet<{ slug: string }[]>("/lojas");
     return lojas.map((l) => l.slug);
-  } catch(err) {
+  } catch (_err) {
     console.warn("[catalog] getProductsSlugs: API indisponível durante o build. Retornando []");
     return [];
   }
