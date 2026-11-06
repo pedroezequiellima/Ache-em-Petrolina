@@ -22,12 +22,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      # Build e Push do Backend (Baseado na Etapa 2)
       - name: Build and Push - Backend
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/backend/dockerfile
+          file: ./apps/backend/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/ache-em-petrolina-backend:latest
-
