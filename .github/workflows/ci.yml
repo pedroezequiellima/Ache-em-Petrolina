@@ -1,8 +1,10 @@
 name: CI Pipeline
 
 on:
+  push:
+    branches: [ "develop" ] # Roda o CI sempre que houver um commit direto na develop
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "develop" ]
 
 jobs:
   build-and-test:
